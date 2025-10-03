@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #0d1b2a; /* Background principal - azul escuro da marca */
+  color: #ffffff; /* Texto primário - branco puro */
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 390px;
+  margin: 0 auto;
+  background: #0d1b2a; /* Background principal - azul escuro da marca */
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Header */
+.header {
+  background: #0d1b2a; /* Background principal - azul escuro da marca */
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #1e293b; /* Borda mais sutil no modo dark */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #00a651; /* Verde da marca para títulos */
+}
+
+.notification-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: #1e293b; /* Background mais escuro para botões no modo dark */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #ffd700; /* Amarelo vibrante para ícones */
+}
+
+.notification-btn:hover {
+  background: #334155;
+}
+
+.stats-row {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #00a651; /* Verde da marca */
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #9ca3af; /* Cinza claro para texto secundário */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  padding: 0 20px 16px;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #1e293b; /* Background mais escuro para tabs no modo dark */
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af; /* Cinza claro para texto secundário */
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-tab.active {
+  background: #a3bd04; /* Verde da marca para tab ativa */
+  color: white;
+}
+
+/* Content */
+.content {
+  padding: 0 20px 100px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24px 0 16px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #00a651; /* Verde da marca para títulos */
+}
+
+/* Tip Cards */
+.tip-card {
+  background: #1e293b; /* Background mais escuro para cards no modo dark */
+  border: 1px solid #334155; /* Borda mais sutil no modo dark */
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+  animation: slideUp 0.3s ease-out;
+}
+
+.tip-card:hover {
+  border-color: #00a651; /* Verde da marca no hover */
+  box-shadow: 0 2px 8px rgba(0, 166, 81, 0.1);
+}
+
+.tip-card.premium {
+  border-color: #ffd700; /* Amarelo vibrante para cards premium */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.1) 0%,
+    rgba(255, 215, 0, 0.05) 100%
+  );
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.match-info {
+  flex: 1;
+}
+
+.league {
+  font-size: 12px;
+  color: #9ca3af; /* Cinza claro para texto secundário */
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.teams {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff; /* Branco puro para texto primário */
+  margin-bottom: 4px;
+}
+
+.match-time {
+  font-size: 13px;
+  color: #9ca3af; /* Cinza claro para texto secundário */
+}
+
+.confidence-badge {
+  background: #00a651; /* Verde da marca */
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.premium-badge {
+  background: #ffd700; /* Amarelo vibrante */
+  color: #0d1b2a; /* Texto escuro sobre fundo amarelo */
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.prediction-section {
+  background: #334155; /* Background mais escuro para seções no modo dark */
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.prediction-label {
+  font-size: 12px;
+  color: #9ca3af; /* Cinza claro para texto secundário */
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prediction-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff; /* Branco puro para texto primário */
+}
+
+.odds-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.odds-item {
+  text-align: center;
+  padding: 12px 8px;
+  background: #334155; /* Background mais escuro para itens no modo dark */
+  border-radius: 8px;
+}
+
+.odds-item.best {
+  background: rgba(0, 166, 81, 0.1); /* Verde da marca com transparência */
+  border: 1px solid #00a651; /* Verde da marca */
+}
+
+.odds-house {
+  font-size: 11px;
+  color: #9ca3af; /* Cinza claro para texto secundário */
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.odds-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff; /* Branco puro para texto primário */
+}
+
+.odds-item.best .odds-value {
+  color: #00a651; /* Verde da marca */
+}
+
+/* Floating Action Button */
+.fab {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: #00a651; /* Verde da marca */
+  border-radius: 28px;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+  transition: transform 0.2s;
+}
+
+.fab:hover {
+  transform: scale(1.05);
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 375px) {
+  .container {
+    max-width: 375px;
+  }
+
+  .content {
+    padding: 0 16px 100px;
+  }
+
+  .header {
+    padding: 16px 16px 12px;
+  }
+
+  .filter-tabs {
+    padding: 0 16px 16px;
+  }
+}
