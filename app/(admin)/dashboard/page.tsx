@@ -11,6 +11,7 @@ import StatsCards from "@/src/components/StatsCards";
 import TipCardModern from "@/src/components/TipCardModern";
 import FilterBar from "@/src/components/FilterBar";
 import TipCard from "@/src/components/TipCard";
+import { Target } from "lucide-react";
 
 const Dashboard: React.FC = () => {
   const { user, loading: authLoading, logout } = useAuth();
@@ -90,6 +91,8 @@ const Dashboard: React.FC = () => {
   const handleSubmitTip = async (tipData: TipFormData) => {
     try {
       setFormLoading(true);
+
+      console.log(tipData);
 
       if (editingTip) {
         await tipsService.updateTip(editingTip.id, tipData);
@@ -271,7 +274,7 @@ const Dashboard: React.FC = () => {
               </div>
             ) : filteredTips.length === 0 ? (
               <div className="text-center py-12">
-                <div className="text-6xl mb-4">🎯</div>
+                <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   {tips.length === 0
                     ? "Nenhum palpite encontrado"
@@ -285,7 +288,7 @@ const Dashboard: React.FC = () => {
                 {tips.length === 0 && (
                   <button
                     onClick={() => setShowForm(true)}
-                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="px-6 py-3 bg-[#a3bd04] text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
                   >
                     ➕ Criar Primeiro Palpite
                   </button>

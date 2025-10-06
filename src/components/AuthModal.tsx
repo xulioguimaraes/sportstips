@@ -75,15 +75,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             {isLogin ? 'Entrar' : 'Criar Conta'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
           >
             <X className="w-6 h-6" />
           </button>
@@ -92,25 +92,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
             </div>
           )}
 
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nome Completo
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-gray-400" />
+                  <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   type="text"
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                   placeholder="Seu nome completo"
                   required={!isLogin}
                 />
@@ -119,18 +119,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="w-5 h-5 text-gray-400" />
+                <Mail className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                 placeholder="seu@email.com"
                 required
               />
@@ -138,18 +138,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Senha
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="w-5 h-5 text-gray-400" />
+                <Lock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
                 placeholder="Sua senha"
                 required
                 minLength={6}
@@ -160,9 +160,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
                 {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                  <EyeOff className="w-5 h-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
                 ) : (
-                  <Eye className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                  <Eye className="w-5 h-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
                 )}
               </button>
             </div>
@@ -171,7 +171,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-all duration-200 transform hover:scale-105 shadow-lg"
+            className="w-full py-3 px-4 bg-[#a3bd04] text-white font-semibold rounded-lg hover:bg-[#8fa003] focus:outline-none focus:ring-2 focus:ring-[#a3bd04] focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -185,12 +185,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </form>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 rounded-b-xl">
-          <p className="text-center text-sm text-gray-600">
+        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 rounded-b-xl">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
             <button
               onClick={toggleMode}
-              className="ml-1 text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200"
+              className="ml-1 text-[#a3bd04] hover:text-[#8fa003] font-medium transition-colors duration-200"
             >
               {isLogin ? 'Criar conta' : 'Fazer login'}
             </button>

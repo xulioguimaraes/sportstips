@@ -2,17 +2,17 @@
 
 import React, { useState } from "react";
 import { TipFormData, Odds } from "@/src/types";
-import { 
-  Save, 
-  X, 
-  Plus, 
-  Trash2, 
-  Star, 
-  Target, 
-  Calendar, 
-  Users, 
+import {
+  Save,
+  X,
+  Plus,
+  Trash2,
+  Star,
+  Target,
+  Calendar,
+  Users,
   Trophy,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 
 interface TipFormProps {
@@ -110,12 +110,12 @@ const TipForm: React.FC<TipFormProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
         <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2">
             {editingTip ? "Editar Palpite" : "Novo Palpite"}
           </h2>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             {editingTip
               ? "Atualize as informações do palpite"
               : "Preencha os dados para criar um novo palpite"}
@@ -126,7 +126,7 @@ const TipForm: React.FC<TipFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             {/* Categoria */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Categoria
               </label>
               <select
@@ -134,7 +134,7 @@ const TipForm: React.FC<TipFormProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value as any })
                 }
-                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 bg-white text-sm sm:text-base"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
               >
                 <option value="football">Futebol</option>
                 <option value="basketball">Basquete</option>
@@ -144,7 +144,7 @@ const TipForm: React.FC<TipFormProps> = ({
 
             {/* Liga */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Liga *
               </label>
               <input
@@ -154,8 +154,10 @@ const TipForm: React.FC<TipFormProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, league: e.target.value })
                 }
-                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 text-sm sm:text-base ${
-                  errors.league ? "border-red-500 bg-red-50" : "border-gray-300"
+                className={`w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  errors.league
+                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
                 placeholder="Digite ou selecione uma liga..."
                 autoComplete="off"
@@ -275,7 +277,7 @@ const TipForm: React.FC<TipFormProps> = ({
 
             {/* Times */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Times *
               </label>
               <input
@@ -284,19 +286,23 @@ const TipForm: React.FC<TipFormProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, teams: e.target.value })
                 }
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base ${
-                  errors.teams ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  errors.teams
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
                 placeholder="Ex: Liverpool vs Chelsea"
               />
               {errors.teams && (
-                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.teams}</p>
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.teams}
+                </p>
               )}
             </div>
 
             {/* Horário */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Data e Horário *
               </label>
               <input
@@ -305,19 +311,23 @@ const TipForm: React.FC<TipFormProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, matchTime: e.target.value })
                 }
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base ${
-                  errors.matchTime ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                  errors.matchTime
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
                 min={new Date().toISOString().slice(0, 16)}
               />
               {errors.matchTime && (
-                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.matchTime}</p>
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.matchTime}
+                </p>
               )}
             </div>
 
             {/* Predição */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Predição *
               </label>
               <input
@@ -326,19 +336,23 @@ const TipForm: React.FC<TipFormProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, prediction: e.target.value })
                 }
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base ${
-                  errors.prediction ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  errors.prediction
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
                 placeholder="Ex: Mais de 2.5 Gols"
               />
               {errors.prediction && (
-                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.prediction}</p>
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.prediction}
+                </p>
               )}
             </div>
 
             {/* Confiança */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confiança (%)
               </label>
               <input
@@ -352,13 +366,17 @@ const TipForm: React.FC<TipFormProps> = ({
                     confidence: parseInt(e.target.value) || 0,
                   })
                 }
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base ${
-                  errors.confidence ? "border-red-500" : "border-gray-300"
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                  errors.confidence
+                    ? "border-red-500"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
                 placeholder="Ex: 85"
               />
               {errors.confidence && (
-                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.confidence}</p>
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.confidence}
+                </p>
               )}
             </div>
 
@@ -371,11 +389,11 @@ const TipForm: React.FC<TipFormProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, isPremium: e.target.checked })
                 }
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
               />
               <label
                 htmlFor="isPremium"
-                className="ml-2 block text-xs sm:text-sm text-gray-900"
+                className="ml-2 block text-xs sm:text-sm text-gray-900 dark:text-white"
               >
                 Palpite Premium
               </label>
@@ -385,7 +403,7 @@ const TipForm: React.FC<TipFormProps> = ({
           {/* Odds */}
           <div>
             <div className="flex justify-between items-center mb-3">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Odds
               </label>
               <button
@@ -401,20 +419,20 @@ const TipForm: React.FC<TipFormProps> = ({
             {formData.odds.map((odd, index) => (
               <div
                 key={index}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3 p-3 sm:p-4 border border-gray-200 rounded-lg"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3 p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50"
               >
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
                     Casa
                   </label>
                   <input
                     type="text"
                     value={odd.house}
                     onChange={(e) => updateOdd(index, "house", e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                       errors[`odds_${index}_house`]
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-gray-300 dark:border-gray-600"
                     }`}
                     placeholder="Ex: Bet365"
                   />
@@ -426,7 +444,7 @@ const TipForm: React.FC<TipFormProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
                     Valor
                   </label>
                   <input
@@ -437,10 +455,10 @@ const TipForm: React.FC<TipFormProps> = ({
                     onChange={(e) =>
                       updateOdd(index, "value", parseFloat(e.target.value) || 0)
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
                       errors[`odds_${index}_value`]
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-gray-300 dark:border-gray-600"
                     }`}
                     placeholder="Ex: 1.85"
                   />
@@ -459,9 +477,9 @@ const TipForm: React.FC<TipFormProps> = ({
                       onChange={(e) =>
                         updateOdd(index, "isBest", e.target.checked)
                       }
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
                     />
-                    <label className="ml-2 block text-xs sm:text-sm text-gray-900">
+                    <label className="ml-2 block text-xs sm:text-sm text-gray-900 dark:text-white">
                       Melhor
                     </label>
                   </div>
@@ -482,18 +500,18 @@ const TipForm: React.FC<TipFormProps> = ({
           </div>
 
           {/* Botões de ação */}
-          <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4 sm:pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onCancel}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200 text-sm sm:text-base"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200 text-sm sm:text-base"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm sm:text-base flex items-center justify-center"
+              className="w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 bg-[#a3bd04] text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm sm:text-base flex items-center justify-center"
             >
               {loading ? (
                 <>

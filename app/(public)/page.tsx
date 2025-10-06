@@ -9,6 +9,8 @@ import { tipsService } from "@/src/services/tipsService";
 import TipCardPublic from "@/src/components/TipCardPublic";
 import DatePicker from "@/src/components/DatePicker";
 import PurchaseModal from "@/src/components/PurchaseModal";
+import PurchaseModalV2 from "@/src/components/PurchaseModalV2";
+import { Target } from "lucide-react";
 
 // Mock data
 const initialStats: Stats = {
@@ -236,7 +238,9 @@ export default function Home() {
 
       <div className="px-2">
         <div className="flex justify-between items-center m-1 mb-1">
-          <div className="text-lg font-bold whitespace-nowrap pr-6">Palpites de</div>
+          <div className="text-lg font-bold whitespace-nowrap pr-6">
+            Palpites de
+          </div>
           <DatePicker
             selectedDate={selectedDate}
             onDateChange={handleDateChange}
@@ -265,19 +269,13 @@ export default function Home() {
           </div>
         ) : filteredTips.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-4">🎯</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
               Nenhum palpite encontrado
             </h3>
             <p className="text-gray-600 mb-4">
               Não há palpites ativos no momento.
             </p>
-            <a
-              href="/dashboard"
-              className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-            >
-              Criar primeiro palpite
-            </a>
           </div>
         ) : (
           filteredTips.map((tip) => (
@@ -294,7 +292,7 @@ export default function Home() {
       <FloatingActionButton onClick={() => handlePremiumClick({} as Tip)} />
 
       {/* Modal de Compra */}
-      <PurchaseModal
+      <PurchaseModalV2
         isOpen={showPurchaseModal}
         onClose={() => setShowPurchaseModal(false)}
         tip={selectedTip || undefined}

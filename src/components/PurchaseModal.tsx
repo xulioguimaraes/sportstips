@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { X, Star, Crown, Target, Check, ArrowRight, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
 import { Tip, PaymentPlan } from "@/src/types";
+import { useRouter } from "next/navigation";
 
 interface PurchaseModalProps {
   isOpen: boolean;
@@ -13,42 +14,32 @@ interface PurchaseModalProps {
 
 const quickPlans: PaymentPlan[] = [
   {
-    id: "single_tip",
-    name: "Palpite Individual",
+    id: "single",
+    name: "Palpite Único",
     type: "package",
     price: 9.9,
     currency: "BRL",
     tipsIncluded: 1,
-    features: ["1 palpite premium", "Análise detalhada", "Suporte por 24h"],
+    features: ["Acesso ao palpite completo desta partida com análise detalhada"],
   },
   {
-    id: "package_5",
-    name: "Pacote 5 Tips",
+    id: "pack",
+    name: "Pacote 5 Palpites",
     type: "package",
     price: 39.9,
     currency: "BRL",
     tipsIncluded: 5,
-    features: [
-      "5 palpites premium",
-      "Economia de 20%",
-      "Análises detalhadas",
-      "Suporte prioritário",
-    ],
+    features: ["5 palpites premium com análises completas. Economize 50%!"],
     isPopular: true,
   },
   {
     id: "weekly",
-    name: "Semanal",
+    name: "Assinatura Semanal",
     type: "subscription",
-    price: 29.9,
+    price: 79.9,
     currency: "BRL",
     duration: 7,
-    features: [
-      "Tips ilimitados",
-      "Análises exclusivas",
-      "Suporte VIP",
-      "Cancelamento livre",
-    ],
+    features: ["Palpites ilimitados por 7 dias. Acesso total à plataforma"],
   },
 ];
 
@@ -58,8 +49,9 @@ export default function PurchaseModal({
   tip,
   onPurchase,
 }: PurchaseModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<string>("package_5");
-
+  const [selectedPlan, setSelectedPlan] = useState<string>("pack");
+  const router = useRouter();
+  
   if (!isOpen) return null;
 
   const handlePurchase = () => {
@@ -69,144 +61,83 @@ export default function PurchaseModal({
 
   const handleViewAllPlans = () => {
     onClose();
-    // Navegar para página de planos
-    window.location.href = "/plans";
+    router.push("/plans");
+  };
+
+  const handlePlanSelect = (planId: string) => {
+    setSelectedPlan(planId);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-900 rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-700">
-        {/* Header */}
-        <div className="relative bg-gradient-to-r from-brand-500 to-brand-600 p-6 rounded-t-3xl text-white">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 rounded-full p-1"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <Star className="w-6 h-6 text-accent-500" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold">Desbloqueie este Palpite</h2>
-              <p className="text-indigo-100 text-sm">
-                {tip ? `${tip.teams} - ${tip.league}` : "Acesso Premium"}
-              </p>
-            </div>
-          </div>
+    <div className="fixed inset-0 bg-brand-dark/90 backdrop-blur-lg flex items-center justify-center z-50 animate-fade-in">
+      <div className="bg-brand-dark rounded-3xl p-10 max-w-md w-[90%] max-h-[90vh] overflow-y-auto shadow-2xl border border-white/10 animate-slide-up relative">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 text-text-secondary hover:text-white text-2xl p-2 rounded-full hover:bg-white/10 transition-all duration-200"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        
+        {/* Unlock Icon */}
+        <div className="w-15 h-15 mx-auto mb-5 bg-gradient-to-br from-brand-green to-brand-green-light rounded-full flex items-center justify-center animate-pulse-custom">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z" fill="white"/>
+            <circle cx="12" cy="15" r="2" fill="white"/>
+          </svg>
         </div>
-
-        {/* Content */}
-        <div className="p-6">
-          {/* Urgência */}
-          <div className="bg-accent-500/10 border border-accent-500/30 rounded-xl p-3 mb-5">
-            <div className="flex items-center space-x-2">
-              <Zap className="w-4 h-4 text-accent-500" />
-              <p className="text-accent-500 font-semibold text-sm">
-                ⏰ Oferta Limitada - Aproveite agora!
+        
+        {/* Title and Subtitle */}
+        <h1 className="text-brand-green text-3xl font-bold text-center mb-2 tracking-tight">Desbloqueie!</h1>
+        <p className="text-text-secondary text-lg text-center mb-8 font-normal">
+          {tip ? `${tip.teams} - ${tip.league}` : "Palmeiras vs Flamengo - Final Copa do Brasil"}
+        </p>
+        
+        {/* Plans Container */}
+        <div className="flex flex-col gap-4 mb-8">
+          {quickPlans.map((plan) => (
+            <div
+              key={plan.id}
+              onClick={() => handlePlanSelect(plan.id)}
+              className={`plan-card border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:border-brand-green hover:bg-brand-green/10 hover:-translate-y-0.5 relative overflow-hidden ${
+                plan.isPopular && selectedPlan !== plan.id
+                  ? "bg-gradient-to-br from-brand-yellow/15 to-brand-yellow/5 border-brand-yellow"
+                  : selectedPlan === plan.id
+                  ? "!border-brand-green !bg-brand-green/15"
+                  : "bg-white/5 border-white/10"
+              }`}
+            >
+              {plan.isPopular && (
+                <div className="absolute -top-px right-5 bg-gradient-to-r from-brand-yellow to-brand-yellow-dark text-brand-dark px-4 py-1.5 rounded-b-xl text-xs font-bold uppercase tracking-wider">
+                  Mais Popular
+                </div>
+              )}
+              
+              <h3 className="text-white text-lg font-semibold mb-2">{plan.name}</h3>
+              <div className="text-brand-green text-3xl font-bold mb-3">
+                R$ {plan.price.toFixed(2).replace('.', ',')}
+              </div>
+              <p className="text-text-secondary text-sm leading-relaxed">
+                {plan.features[0]}
               </p>
             </div>
-          </div>
-
-          {/* Planos */}
-          <div className="space-y-3 mb-6">
-            {quickPlans.map((plan) => (
-              <div
-                key={plan.id}
-                onClick={() => setSelectedPlan(plan.id)}
-                className={`relative border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-                  selectedPlan === plan.id
-                    ? "border-brand-500 bg-brand-500/10 shadow-md"
-                    : "border-gray-600 hover:border-brand-500 bg-dark-800"
-                }`}
-              >
-                {plan.isPopular && (
-                  <div className="absolute -top-2 left-4 bg-accent-500 text-dark-900 px-3 py-1 rounded-full text-xs font-bold">
-                    MAIS POPULAR
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="font-bold text-white">{plan.name}</h3>
-                      {plan.isPopular && (
-                        <Crown className="w-4 h-4 text-accent-500" />
-                      )}
-                    </div>
-
-                    <div className="flex items-baseline space-x-2 mb-2">
-                      <span className="text-2xl font-bold text-brand-500">
-                        R$ {plan.price.toFixed(2)}
-                      </span>
-                      {plan.type === "package" &&
-                        plan.tipsIncluded &&
-                        plan.tipsIncluded > 1 && (
-                          <span className="text-sm text-gray-400">
-                            / {plan.tipsIncluded} tips
-                          </span>
-                        )}
-                      {plan.type === "subscription" && (
-                        <span className="text-sm text-gray-400">/ semana</span>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      {plan.features.slice(0, 2).map((feature, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-2"
-                        >
-                          <Check className="w-3 h-3 text-brand-500 flex-shrink-0" />
-                          <span className="text-sm text-gray-300">
-                            {feature}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedPlan === plan.id
-                        ? "border-brand-500 bg-brand-500"
-                        : "border-gray-500"
-                    }`}
-                  >
-                    {selectedPlan === plan.id && (
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA Principal */}
+          ))}
+        </div>
+        
+        {/* Buttons */}
+        <div className="flex flex-col gap-3">
           <button
             onClick={handlePurchase}
-            className="w-full bg-brand-500 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-brand-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="bg-gradient-to-r from-brand-green to-brand-green-light text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-green/40"
           >
             Comprar Agora
           </button>
-
-          {/* CTA Secundário */}
           <button
             onClick={handleViewAllPlans}
-            className="w-full mt-3 text-brand-500 py-3 px-6 rounded-xl font-medium hover:bg-brand-500/10 transition-colors flex items-center justify-center space-x-2"
+            className="bg-transparent text-text-secondary border-2 border-white/20 font-medium py-3.5 px-8 rounded-xl transition-all duration-300 hover:border-brand-green hover:text-brand-green hover:bg-brand-green/10"
           >
-            <span>Ver todos os planos</span>
-            <ArrowRight className="w-4 h-4" />
+            Ver Todos os Planos
           </button>
-
-          {/* Garantia */}
-          <div className="mt-4 text-center">
-            <p className="text-xs text-gray-400">
-              🔒 Pagamento 100% seguro • 💰 Garantia de 7 dias
-            </p>
-          </div>
         </div>
       </div>
     </div>

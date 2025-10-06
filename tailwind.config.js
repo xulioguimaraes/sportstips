@@ -38,6 +38,16 @@ module.exports = {
           900: '#14532d',
           950: '#052e16',
         },
+        // Verde da marca para o novo modal
+        'brand-green': '#00A651',
+        'brand-green-light': '#00D463',
+        // Amarelo da marca para o novo modal
+        'brand-yellow': '#FFD700',
+        'brand-yellow-dark': '#FFA500',
+        // Background escuro da marca
+        'brand-dark': '#0D1B2A',
+        // Texto secundário
+        'text-secondary': '#B0B0B0',
         // Amarelo vibrante (destaques e ícones)
         accent: {
           50: '#fffbeb',
@@ -85,6 +95,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'inter': ['Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
         '18': '4.5rem',
