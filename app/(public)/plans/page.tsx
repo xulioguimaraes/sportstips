@@ -139,7 +139,7 @@ export default function PlansPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
         <div className="container mx-auto px-4 text-center">
@@ -176,10 +176,10 @@ export default function PlansPage() {
       {/* Plans Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Planos Disponíveis
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Escolha o plano que melhor se adapta ao seu perfil de apostas
           </p>
         </div>
@@ -190,10 +190,10 @@ export default function PlansPage() {
             return (
               <div
                 key={plan.id}
-                className={`relative bg-white rounded-2xl shadow-lg border-2 p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 ${
+                className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 ${
                   plan.isPopular
                     ? "border-indigo-500 scale-105"
-                    : "border-gray-200"
+                    : "border-gray-200 dark:border-gray-700"
                 }`}
               >
                 {plan.isPopular && (
@@ -206,22 +206,22 @@ export default function PlansPage() {
                 )}
 
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     {plan.name}
                   </h3>
                   
                   <div className="mb-4">
                     <div className="flex items-baseline justify-center space-x-2">
-                      <span className="text-4xl font-bold text-indigo-600">
+                      <span className="text-4xl font-bold text-[#a3bd04]">
                         R$ {plan.price.toFixed(2)}
                       </span>
                       {plan.type === "package" && plan.tipsIncluded && plan.tipsIncluded > 1 && (
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 dark:text-gray-400">
                           / {plan.tipsIncluded} tips
                         </span>
                       )}
                       {plan.type === "subscription" && (
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 dark:text-gray-400">
                           / {plan.duration === 7 ? "semana" : "mês"}
                         </span>
                       )}
@@ -229,7 +229,7 @@ export default function PlansPage() {
                     
                     {savings && (
                       <div className="mt-2">
-                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                        <span className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium">
                           Economia de {savings.percentage}% (R$ {savings.savings.toFixed(2)})
                         </span>
                       </div>
@@ -241,7 +241,7 @@ export default function PlansPage() {
                   {plan.features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -250,8 +250,8 @@ export default function PlansPage() {
                   onClick={() => handlePurchase(plan.id)}
                   className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-[1.02] ${
                     plan.isPopular
-                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg"
-                      : "bg-gray-900 text-white hover:bg-gray-800"
+                      ? "bg-[#a3bd04] text-white hover:bg-[#8fa003] shadow-lg"
+                      : "bg-gray-900 dark:bg-gray-700 text-white hover:bg-gray-800 dark:hover:bg-gray-600"
                   }`}
                 >
                   Escolher Plano
@@ -263,29 +263,29 @@ export default function PlansPage() {
       </div>
 
       {/* Testimonials */}
-      <div className="bg-white py-16">
+      <div className="bg-white dark:bg-gray-800 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               O que nossos clientes dizem
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Mais de 2.500 apostadores já confiam em nossos palpites
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-6">
+              <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-4 italic">&ldquo;{testimonial.content}&rdquo;</p>
                 <div>
-                  <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                  <div className="text-sm text-gray-500">{testimonial.role}</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</div>
                 </div>
               </div>
             ))}
@@ -294,51 +294,51 @@ export default function PlansPage() {
       </div>
 
       {/* Features Section */}
-      <div className="bg-gray-50 py-16">
+      <div className="bg-gray-50 dark:bg-gray-900 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Por que escolher nossos palpites?
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             <div className="text-center">
-              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-indigo-600" />
+              <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Alta Performance</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Alta Performance</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Taxa de acerto superior a 85% com ROI médio de 25%
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Garantia Total</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Garantia Total</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 7 dias de garantia ou seu dinheiro de volta
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Suporte VIP</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Suporte VIP</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Atendimento prioritário e grupo exclusivo
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-yellow-600" />
+              <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Análises Exclusivas</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Análises Exclusivas</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Insights profissionais e dados exclusivos
               </p>
             </div>
@@ -347,40 +347,40 @@ export default function PlansPage() {
       </div>
 
       {/* FAQ Section */}
-      <div className="bg-white py-16">
+      <div className="bg-white dark:bg-gray-800 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Perguntas Frequentes
             </h2>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-6">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">
                 Como funciona a garantia de 7 dias?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Se você não ficar satisfeito com nossos palpites nos primeiros 7 dias, 
                 devolvemos 100% do seu dinheiro, sem perguntas.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">
                 Os palpites são realmente exclusivos?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Sim! Nossos palpites são desenvolvidos por nossa equipe de especialistas 
                 e não são compartilhados em outros canais.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">
                 Posso cancelar minha assinatura a qualquer momento?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Sim, você pode cancelar sua assinatura a qualquer momento. 
                 Não há taxas de cancelamento ou multas.
               </p>
@@ -400,7 +400,7 @@ export default function PlansPage() {
           </p>
           <button
             onClick={() => setSelectedPlan("package_5")}
-            className="bg-white text-indigo-600 py-4 px-8 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
+            className="bg-white text-[#a3bd04] py-4 px-8 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors"
           >
             Escolher Plano Agora
           </button>

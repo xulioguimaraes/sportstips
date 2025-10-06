@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
@@ -15,6 +15,7 @@ import {
 import { createPixEVPKey } from "@/src/services/asaasService";
 import { saveTransaction } from "@/src/services/transactionService";
 import { useAuth } from "@/src/contexts/AuthContext";
+import AuthModal from "@/src/components/AuthModal";
 
 interface PlanData {
   id: string;
@@ -166,6 +167,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+
+  // Debug: monitorar mudanças no usuário
+  useEffect(() => {
+    console.log('Usuário mudou:', !!user, user?.email);
+  }, [user]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "pix" | "card"
   >("pix");
@@ -177,7 +183,9 @@ export default function CheckoutPage() {
     "pending" | "processing" | "completed"
   >("pending");
   const [showPixModal, setShowPixModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [transactionId, setTransactionId] = useState<string>("");
+  const [pendingPayment, setPendingPayment] = useState(false);
 
   // Determinar o tipo de plano baseado no ID
   const getPlanType = (planId: string): 'package' | 'subscription' => {
@@ -185,13 +193,13 @@ export default function CheckoutPage() {
     return 'package';
   };
 
-  const planData: PlanData = {
+  const planData: PlanData = useMemo(() => ({
     id: searchParams.get("plan") || "",
     name: decodeURIComponent(searchParams.get("name") || ""),
     price: parseFloat(searchParams.get("price") || "0"),
     description: "",
     type: getPlanType(searchParams.get("plan") || ""),
-  };
+  }), [searchParams]);
 
   // Determinar métodos de pagamento disponíveis baseado no tipo de plano
   const availablePaymentMethods = planData.type === 'subscription' 
@@ -210,8 +218,84 @@ export default function CheckoutPage() {
   // Remover geração mock do PIX - agora usamos API real
 
   const handlePayment = async () => {
+    console.log('handlePayment chamado, user:', !!user);
     if (!user) {
-      alert('Você precisa estar logado para fazer uma compra');
+      console.log('Usuário não logado, abrindo modal...');
+      setPendingPayment(true);
+      setShowAuthModal(true);
+      return;
+    }
+
+    console.log('Usuário logado, processando pagamento...');
+    await processPayment();
+  };
+
+  const processPayment = useCallback(async () => {
+    console.log('processPayment chamado, user:', !!user);
+    if (selectedPaymentMethod === "pix") {
+      // Para PIX, gerar chave PIX e salvar transação
+      setIsLoading(true);
+      
+      try {
+        // Chave PIX fixa - você pode tornar isso dinâmico se necessário
+        const addressKey = "00e90a64-45d4-46e4-b109-23f52be1897f";
+        
+        // Criar chave PIX EVP via API do Asaas
+        const pixData = await createPixEVPKey(
+          planData.price,
+          planData.name,
+          addressKey
+        );
+        
+        // Salvar transação no Firestore
+        const transactionId = await saveTransaction({
+          userId: user!.uid,
+          planId: planData.id,
+          planName: planData.name,
+          planPrice: planData.price,
+          planType: planData.type,
+          paymentMethod: 'pix',
+          pixKeyId: pixData.id,
+          pixKey: addressKey,
+          pixQrCode: pixData.encodedImage,
+          pixPayload: pixData.payload,
+          pixExpirationDate: pixData.expirationDate,
+          status: 'pending',
+        });
+
+        setTransactionId(transactionId);
+        setPixCode(pixData.payload);
+        setQrCodeImage(pixData.encodedImage);
+        setPixExpirationDate(pixData.expirationDate);
+        setShowPixModal(true);
+        setIsLoading(false);
+        
+      } catch (error) {
+        console.error('Erro ao gerar PIX:', error);
+        alert('Erro ao gerar código PIX. Tente novamente.');
+        setIsLoading(false);
+      }
+    } else if (selectedPaymentMethod === "card") {
+      // Para cartão, processar pagamento via Asaas
+      setIsLoading(true);
+      setPaymentStatus("processing");
+      
+      try {
+        // Aqui você integraria com a API do Asaas para cartão
+        await processCardPayment();
+      } catch (error) {
+        console.error('Erro no pagamento:', error);
+        setIsLoading(false);
+        setPaymentStatus("pending");
+      }
+    }
+  }, [selectedPaymentMethod, planData, user]);
+
+  // Função separada para pagamento após login
+  const handlePaymentAfterLogin = useCallback(async () => {
+    console.log('handlePaymentAfterLogin chamado, user:', !!user);
+    if (!user) {
+      console.log('Usuário ainda não está logado');
       return;
     }
 
@@ -272,7 +356,30 @@ export default function CheckoutPage() {
         setPaymentStatus("pending");
       }
     }
-  };
+  }, [user, selectedPaymentMethod, planData]);
+
+  // Executar pagamento pendente quando usuário fizer login
+  useEffect(() => {
+    if (user && pendingPayment) {
+      console.log('Usuário logado, executando pagamento pendente...');
+      setPendingPayment(false);
+      // Usar setTimeout para garantir que o estado foi atualizado
+      setTimeout(() => {
+        handlePaymentAfterLogin();
+      }, 100);
+    }
+  }, [user, pendingPayment, handlePaymentAfterLogin]);
+
+  // Monitorar quando o modal é fechado e usuário está logado
+  useEffect(() => {
+    if (user && !showAuthModal && pendingPayment) {
+      console.log('Modal fechado e usuário logado, executando pagamento...');
+      setPendingPayment(false);
+      setTimeout(() => {
+        handlePaymentAfterLogin();
+      }, 100);
+    }
+  }, [user, showAuthModal, pendingPayment, handlePaymentAfterLogin]);
 
   const processCardPayment = async () => {
     // Simular processamento do pagamento via Asaas
@@ -343,7 +450,7 @@ export default function CheckoutPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-24">
+        <div className="grid grid-cols-1 gap-4 mb-24">
           {/* Resumo do Pedido */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
@@ -465,6 +572,16 @@ export default function CheckoutPage() {
           qrCodeImage={qrCodeImage}
           expirationDate={pixExpirationDate}
           onPaymentComplete={handlePixPaymentComplete}
+        />
+
+        {/* Modal de Autenticação */}
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => {
+            console.log('Modal fechado');
+            setShowAuthModal(false);
+            // Não limpar pendingPayment aqui, deixar o useEffect gerenciar
+          }}
         />
       </div>
     </div>

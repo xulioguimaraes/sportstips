@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/src/lib/firebase";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 export async function POST(request: NextRequest) {
   try {
-    const { pixKeyId, status = 'completed' } = await request.json();
+    const { pixKeyId, status = "completed" } = await request.json();
 
     // Validar dados obrigatórios
     if (!pixKeyId) {
@@ -15,8 +22,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar transação pelo pixKeyId
-    const transactionsRef = collection(db, 'transactions');
-    const q = query(transactionsRef, where('pixKeyId', '==', pixKeyId));
+    const transactionsRef = collection(db, "transactions");
+    const q = query(transactionsRef, where("pixKeyId", "==", pixKeyId));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
@@ -28,29 +35,26 @@ export async function POST(request: NextRequest) {
 
     // Atualizar todas as transações encontradas (normalmente será apenas uma)
     const updatePromises = querySnapshot.docs.map(async (docSnapshot) => {
-      const transactionRef = doc(db, 'transactions', docSnapshot.id);
+      const transactionRef = doc(db, "transactions", docSnapshot.id);
       await updateDoc(transactionRef, {
         status: status,
         updatedAt: new Date(),
       });
       return {
         id: docSnapshot.id,
-        data: docSnapshot.data()
+        data: docSnapshot.data(),
       };
     });
 
     const updatedTransactions = await Promise.all(updatePromises);
-
-    console.log(`Status atualizado para ${updatedTransactions.length} transação(ões) com pixKeyId: ${pixKeyId}`);
 
     return NextResponse.json({
       success: true,
       message: `Status atualizado para ${updatedTransactions.length} transação(ões)`,
       pixKeyId: pixKeyId,
       newStatus: status,
-      updatedTransactions: updatedTransactions.length
+      updatedTransactions: updatedTransactions.length,
     });
-
   } catch (error) {
     console.error("Erro ao atualizar status da transação:", error);
     return NextResponse.json(
@@ -64,7 +68,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const pixKeyId = searchParams.get('pixKeyId');
+    const pixKeyId = searchParams.get("pixKeyId");
 
     if (!pixKeyId) {
       return NextResponse.json(
@@ -74,8 +78,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar transação pelo pixKeyId
-    const transactionsRef = collection(db, 'transactions');
-    const q = query(transactionsRef, where('pixKeyId', '==', pixKeyId));
+    const transactionsRef = collection(db, "transactions");
+    const q = query(transactionsRef, where("pixKeyId", "==", pixKeyId));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
@@ -86,17 +90,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Retornar dados da transação
-    const transactions = querySnapshot.docs.map(doc => ({
+    const transactions = querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
 
     return NextResponse.json({
       success: true,
       pixKeyId: pixKeyId,
-      transactions: transactions
+      transactions: transactions,
     });
-
   } catch (error) {
     console.error("Erro ao buscar transação:", error);
     return NextResponse.json(

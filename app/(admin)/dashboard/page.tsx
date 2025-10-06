@@ -92,8 +92,6 @@ const Dashboard: React.FC = () => {
     try {
       setFormLoading(true);
 
-      console.log(tipData);
-
       if (editingTip) {
         await tipsService.updateTip(editingTip.id, tipData);
       } else {

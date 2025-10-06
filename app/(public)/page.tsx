@@ -119,7 +119,6 @@ export default function Home() {
 
         // Buscar palpites por data
         const tipsData = await tipsService.getTipsByDate(targetDate);
-        console.log("📅 Palpites para", targetDate, ":", tipsData);
         setTips(tipsData);
         setFilteredTips(tipsData);
 
@@ -195,7 +194,6 @@ export default function Home() {
   };
 
   const handlePurchase = (planId: string) => {
-    console.log("Comprando plano:", planId, "para tip:", selectedTip?.id);
     // Implementar lógica de compra
     alert(`Redirecionando para pagamento do plano: ${planId}`);
   };

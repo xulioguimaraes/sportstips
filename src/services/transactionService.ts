@@ -96,7 +96,7 @@ export const getTransactionByPixKeyId = async (pixKeyId: string): Promise<Transa
     const transactions = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    })) as TransactionData[];
+    })) as (TransactionData & { id: string })[];
 
     return transactions;
   } catch (error) {

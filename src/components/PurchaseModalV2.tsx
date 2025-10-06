@@ -63,11 +63,9 @@ export default function PurchaseModalV2({
 
   const selectPlan = (planType: string) => {
     setSelectedPlan(planType);
-    console.log("Plano selecionado:", planType);
   };
 
   const buyNow = () => {
-    console.log("Comprando plano:", selectedPlan);
     const selectedPlanData = mockPlans.find((plan) => plan.id === selectedPlan);
     onClose();
     // Redirecionar para checkout com dados do plano
@@ -79,7 +77,6 @@ export default function PurchaseModalV2({
   };
 
   const viewAllPlans = () => {
-    console.log("Visualizando todos os planos");
     onClose();
     router.push("/plans");
   };

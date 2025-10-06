@@ -5,7 +5,7 @@ import { useAuth } from "@/src/contexts/AuthContext";
 import { Target, Crown, Clock, TrendingUp, Calendar } from "lucide-react";
 import TipCardPublic from "@/src/components/TipCardPublic";
 import { LoadingGetDataUser } from "@/src/components/LoadingGetDataUser";
-
+import { useRouter } from "next/navigation";
 // Mock data para tips comprados
 const purchasedTips = [
   {
@@ -87,7 +87,7 @@ export default function TipsPage() {
   const [tips, setTips] = useState(purchasedTips);
   const [filter, setFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
-
+  const router = useRouter();
   // Simular loading de 2 segundos
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -138,27 +138,27 @@ export default function TipsPage() {
 
   // Mostrar loading enquanto carrega
   if (isLoading || authLoading) {
-    return <LoadingGetDataUser />;
+    return <LoadingGetDataUser message="Carregando seus Tips Comprados" />;
   }
 
   // Mostrar tela de login apenas após o loading
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
-          <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Acesse seus Tips Comprados
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg px-4 py-6 w-full max-w-md text-center">
+          <Target className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Acesse seus Tips <br /> Comprados
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Faça login para ver todos os tips premium que você comprou
           </p>
           <button
             onClick={() => {
               // O modal será gerenciado pelo layout
-              window.location.href = "/";
+              router.push("/?modal=login");
             }}
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            className="w-full bg-[#a3bd04] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#8fa003] transition-colors"
           >
             Fazer Login
           </button>
@@ -170,7 +170,7 @@ export default function TipsPage() {
   return (
     <>
       {/* Header */}
-      <div className="bg-black rounded-xl p-6 mb-6 text-white">
+      <div className="bg-black rounded-xl p-3 mb-4 text-white mx-2">
         <div className="flex items-center space-x-3">
           <Target className="w-8 h-8" />
           <div>
@@ -180,46 +180,11 @@ export default function TipsPage() {
         </div>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid grid-cols-2 gap-4 mb-6 px-2">
-        <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-gray-600">Total de Tips</div>
-              <div className="text-2xl font-bold text-indigo-600">
-                {stats.total}
-              </div>
-            </div>
-            <Crown className="w-8 h-8 text-yellow-500" />
-          </div>
-        </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold text-green-600">
-                {stats.winRate.toFixed(0)}%
-              </div>
-              <div className="text-sm text-gray-600">Taxa de Acerto</div>
-            </div>
-            <TrendingUp className="w-8 h-8 text-green-500" />
-          </div>
-        </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold text-red-600">
-                {stats.losses}
-              </div>
-              <div className="text-sm text-gray-600">Perdas</div>
-            </div>
-            <TrendingUp className="w-8 h-8 text-red-500 rotate-180" />
-          </div>
-        </div>
-      </div>
-
       {/* Filtros */}
-      <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
-        <h3 className="font-semibold text-gray-900 mb-3">Filtrar Tips</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-4 shadow-sm mx-2">
+        <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+          Filtrar Tips
+        </h3>
         <div className="flex flex-wrap gap-2">
           {[
             { id: "all", label: "Todos", count: stats.total },
@@ -237,8 +202,8 @@ export default function TipsPage() {
               onClick={() => setFilter(filterOption.id)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === filterOption.id
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-[#a3bd04] text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               }`}
             >
               {filterOption.label} ({filterOption.count})
@@ -251,11 +216,11 @@ export default function TipsPage() {
       <div className="space-y-4 px-2 pb-24">
         {filteredTips.length === 0 ? (
           <div className="text-center py-12">
-            <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <Target className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Nenhum tip encontrado
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {filter === "all"
                 ? "Você ainda não comprou nenhum tip premium."
                 : `Não há tips com status "${filter}".`}
@@ -271,8 +236,8 @@ export default function TipsPage() {
                 <span>Comprado</span>
               </div>
               {/* Informações de compra */}
-              <div className="bg-gray-50 p-3 rounded-b-xl">
-                <div className="flex justify-between items-center text-sm text-gray-600">
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-b-xl">
+                <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center space-x-1">
                     <Calendar className="w-4 h-4" />
                     <span>
@@ -280,18 +245,18 @@ export default function TipsPage() {
                       {new Date(tip.purchasedAt).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
-                  <div className="font-medium text-indigo-600">
+                  <div className="font-medium text-[#a3bd04]">
                     R$ {tip.price.toFixed(2)}
                   </div>
                 </div>
 
                 {tip.result === "loss" && (
-                  <div className="mt-2 text-sm text-red-600 font-medium">
+                  <div className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium">
                     ❌ Perda: R$ {tip.price.toFixed(2)}
                   </div>
                 )}
                 {tip.result === "pending" && (
-                  <div className="mt-2 text-sm text-yellow-600 font-medium flex items-center space-x-1">
+                  <div className="mt-2 text-sm text-yellow-600 dark:text-yellow-400 font-medium flex items-center space-x-1">
                     <Clock className="w-4 h-4" />
                     <span>Aguardando resultado</span>
                   </div>
