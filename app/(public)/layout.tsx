@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "@/src/contexts/AuthContext";
+import { PlansProvider } from "@/src/contexts/PlansContext";
 import { NavItem } from "@/src/types";
 import BottomNavigation from "@/src/components/BottomNavigation";
 import LogoCss from "@/src/components/LogoCss";
@@ -107,7 +108,9 @@ export default function PublicLayout({
 }) {
   return (
     <AuthProvider>
-      <PublicLayoutContent>{children}</PublicLayoutContent>
+      <PlansProvider>
+        <PublicLayoutContent>{children}</PublicLayoutContent>
+      </PlansProvider>
     </AuthProvider>
   );
 }

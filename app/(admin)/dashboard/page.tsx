@@ -12,6 +12,11 @@ import TipCardModern from "@/src/components/TipCardModern";
 import FilterBar from "@/src/components/FilterBar";
 import TipCard from "@/src/components/TipCard";
 import { Target } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const PlansManagement = dynamic(() => import("../plans/page"), {
+  ssr: false,
+});
 
 const Dashboard: React.FC = () => {
   const { user, loading: authLoading, logout } = useAuth();
@@ -164,7 +169,7 @@ const Dashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8">
+        <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8 bg-[#0D1B2A]">
           <div className="mb-6">
             <button
               onClick={() => {
@@ -309,6 +314,9 @@ const Dashboard: React.FC = () => {
           </div>
         );
 
+      case "plans":
+        return <PlansManagement />;
+
       case "analytics":
         return (
           <div>
@@ -365,7 +373,9 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8">{renderContent()}</div>
+      <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8 bg-[#0D1B2A]">
+        {renderContent()}
+      </div>
     </div>
   );
 };

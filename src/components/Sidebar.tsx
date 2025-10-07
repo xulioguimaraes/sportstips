@@ -4,6 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/src/contexts/AuthContext";
 import LogoCss from "./LogoCss";
 import Image from "next/image";
+import {
+  LayoutDashboard,
+  Target,
+  TrendingUp,
+  Settings,
+  LogOut,
+  Package,
+} from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
@@ -16,10 +24,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "tips", label: "Palpites", icon: "🎯" },
-    { id: "analytics", label: "Analytics", icon: "📈" },
-    { id: "settings", label: "Configurações", icon: "⚙️" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "tips", label: "Palpites", icon: Target },
+    { id: "plans", label: "Planos", icon: Package },
+    { id: "analytics", label: "Analytics", icon: TrendingUp },
+    { id: "settings", label: "Configurações", icon: Settings },
   ];
 
   // Detect mobile screen size
@@ -54,22 +63,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       {isMobile && (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="fixed top-4 right-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200 lg:hidden"
+          className="fixed top-4 right-4 z-50 p-2 bg-[#1B2838] rounded-lg shadow-lg border border-gray-700 lg:hidden"
           aria-label="Toggle menu"
         >
           <div className="w-6 h-6 flex flex-col justify-center space-y-1">
             <span
-              className={`block h-0.5 w-6 bg-gray-600 transition-all duration-300 ${
+              className={`block h-0.5 w-6 bg-gray-300 transition-all duration-300 ${
                 isOpen ? "rotate-45 translate-y-1.5" : ""
               }`}
             ></span>
             <span
-              className={`block h-0.5 w-6 bg-gray-600 transition-all duration-300 ${
+              className={`block h-0.5 w-6 bg-gray-300 transition-all duration-300 ${
                 isOpen ? "opacity-0" : ""
               }`}
             ></span>
             <span
-              className={`block h-0.5 w-6 bg-gray-600 transition-all duration-300 ${
+              className={`block h-0.5 w-6 bg-gray-300 transition-all duration-300 ${
                 isOpen ? "-rotate-45 -translate-y-1.5" : ""
               }`}
             ></span>
@@ -80,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       {/* Overlay for mobile */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0  bg-opacity-20 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={handleOverlayClick}
         />
       )}
@@ -88,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       {/* Sidebar */}
       <div
         className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl border-r border-gray-200
+        fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 shadow-xl border-r border-gray-700
         transform transition-transform duration-300 ease-in-out
         ${
           isMobile
@@ -100,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       `}
       >
         {/* Logo */}
-        <div className="relative flex items-center justify-center h-16 px-4 bg-gray-800">
+        <div className="relative flex items-center justify-center h-16 px-4 bg-gray-800 border-b border-gray-700">
           <div className="flex items-center justify-center">
             {/* Logo Sportstips com Tailwind */}
             <Image
@@ -114,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
           {isMobile && (
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white hover:text-gray-200 transition-colors duration-200"
+              className="absolute right-4 text-gray-400 hover:text-white transition-colors duration-200"
               aria-label="Close menu"
             >
               <svg
@@ -135,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         </div>
 
         {/* User Info */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-[#a3bd04] rounded-full flex items-center justify-center">
               <span className="text-white font-semibold text-sm">
@@ -143,41 +152,44 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-white truncate">
                 {user?.displayName || "Admin"}
               </p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+              <p className="text-xs text-gray-400 truncate">{user?.email}</p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="mt-6 px-3">
+        <nav className="flex-1 py-4 px-3 overflow-y-auto">
           <div className="space-y-1">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                  activeTab === item.id
-                    ? "bg-[#a3bd04] text-indigo-700 border-r-2 border-gray-800"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                <span className="mr-3 text-lg">{item.icon}</span>
-                {item.label}
-              </button>
-            ))}
+            {menuItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabChange(item.id)}
+                  className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    activeTab === item.id
+                      ? "bg-[#a3bd04] text-white shadow-lg"
+                      : "text-gray-400 hover:bg-[#1B2838] hover:text-white"
+                  }`}
+                >
+                  <IconComponent className="mr-3 w-5 h-5" />
+                  {item.label}
+                </button>
+              );
+            })}
           </div>
         </nav>
 
         {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-800">
           <button
             onClick={logout}
-            className="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200"
+            className="w-full flex items-center px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-red-900/20 hover:text-red-400 rounded-lg transition-colors duration-200"
           >
-            <span className="mr-3 text-lg">🚪</span>
+            <LogOut className="mr-3 w-5 h-5" />
             Sair
           </button>
         </div>

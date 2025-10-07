@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tip } from "@/src/types";
+import { Tip, PaymentPlan } from "@/src/types";
 import { useRouter } from "next/navigation";
+import { usePlans } from "@/src/contexts/PlansContext";
 
 interface PurchaseModalProps {
   isOpen: boolean;
@@ -11,53 +12,23 @@ interface PurchaseModalProps {
   onPurchase: (planId: string) => void;
 }
 
-const mockPlans = [
-  {
-    id: "single",
-    name: "Palpite Único",
-    type: "package",
-    price: 9.9,
-    currency: "BRL",
-    tipsIncluded: 1,
-    description:
-      "Acesso ao palpite completo desta partida com análise detalhada",
-    isPopular: false,
-  },
-  {
-    id: "pack",
-    name: "Pacote 5 Palpites",
-    type: "package",
-    price: 39.9,
-    currency: "BRL",
-    tipsIncluded: 5,
-    description: "5 palpites premium com análises completas. Economize 50%!",
-    isPopular: true,
-  },
-  {
-    id: "weekly",
-    name: "Assinatura Semanal",
-    type: "subscription",
-    price: 79.9,
-    currency: "BRL",
-    duration: 7,
-    description: "Palpites ilimitados por 7 dias. Acesso total à plataforma",
-    isPopular: false,
-  },
-];
-
 export default function PurchaseModalV2({
   isOpen,
   onClose,
   tip,
   onPurchase,
 }: PurchaseModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<string>("pack"); // Plano mais popular selecionado por padrão
+  const { plans, loading } = usePlans();
+  const [selectedPlan, setSelectedPlan] = useState<string>("");
   const router = useRouter();
 
-  // Set popular plan as selected by default on mount
+  // Selecionar plano popular por padrão quando os planos carregarem
   useEffect(() => {
-    setSelectedPlan("pack");
-  }, []);
+    if (plans.length > 0 && !selectedPlan) {
+      const popularPlan = plans.find((p) => p.isPopular);
+      setSelectedPlan(popularPlan?.id || plans[0]?.id || "");
+    }
+  }, [plans, selectedPlan]);
 
   if (!isOpen) return null;
 
@@ -66,14 +37,18 @@ export default function PurchaseModalV2({
   };
 
   const buyNow = () => {
-    const selectedPlanData = mockPlans.find((plan) => plan.id === selectedPlan);
+    const selectedPlanData = plans.find((plan) => plan.id === selectedPlan);
     onClose();
     // Redirecionar para checkout com dados do plano
-    router.push(
-      `/checkout?plan=${selectedPlan}&price=${
-        selectedPlanData?.price
-      }&name=${encodeURIComponent(selectedPlanData?.name || "")}`
-    );
+    if (selectedPlanData) {
+      // Converter centavos para reais
+      const priceInReais = selectedPlanData.price / 100;
+      router.push(
+        `/checkout?plan=${selectedPlan}&price=${priceInReais}&name=${encodeURIComponent(
+          selectedPlanData.name
+        )}`
+      );
+    }
   };
 
   const viewAllPlans = () => {
@@ -114,46 +89,77 @@ export default function PurchaseModalV2({
         )}
 
         <div className="flex flex-col gap-2 mb-4">
-          {mockPlans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`plan-card p-2 ${plan.isPopular ? "popular" : ""} ${
-                selectedPlan === plan.id ? "selected" : ""
-              }`}
-              onClick={() => selectPlan(plan.id)}
-            >
-              {plan.isPopular && (
-                <div className="popular-badge">Mais Popular</div>
-              )}
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="radio"
-                  name="plan"
-                  value={plan.id}
-                  checked={selectedPlan === plan.id}
-                  onChange={() => selectPlan(plan.id)}
-                  className="plan-radio"
-                />
-
-                <div className="flex-1">
-                  <h3 className="plan-name">{plan.name}</h3>
-                  <div className="plan-price ">
-                    R$ {plan.price.toFixed(2).replace(".", ",")}
-                  </div>
-                  <p className="plan-description">{plan.description}</p>
-                </div>
-              </div>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a3bd04] mx-auto mb-2"></div>
+              <p className="text-sm text-gray-400">Carregando planos...</p>
             </div>
-          ))}
+          ) : plans.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-400">Nenhum plano disponível no momento</p>
+            </div>
+          ) : (
+            plans.map((plan) => {
+              // Construir descrição baseada no tipo de plano
+              const description =
+                plan.type === "package"
+                  ? `${plan.tipsIncluded} ${plan.tipsIncluded === 1 ? "palpite" : "palpites"} premium com análises completas`
+                  : `Tips ilimitados por ${plan.duration} dias. Acesso total à plataforma`;
+
+              return (
+                <div
+                  key={plan.id}
+                  className={`plan-card p-2 ${plan.isPopular ? "popular" : ""} ${
+                    selectedPlan === plan.id ? "selected" : ""
+                  }`}
+                  onClick={() => selectPlan(plan.id)}
+                >
+                  {plan.isPopular && (
+                    <div className="popular-badge">Mais Popular</div>
+                  )}
+
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      name="plan"
+                      value={plan.id}
+                      checked={selectedPlan === plan.id}
+                      onChange={() => selectPlan(plan.id)}
+                      className="plan-radio"
+                    />
+
+                    <div className="flex-1">
+                      <h3 className="plan-name">{plan.name}</h3>
+                      <div className="plan-price">
+                        R$ {(plan.price / 100).toFixed(2).replace(".", ",")}
+                      </div>
+                      <p className="plan-description">{description}</p>
+                      
+                      {/* Mostrar features se houver */}
+                      {plan.features && plan.features.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {plan.features.slice(0, 2).map((feature, idx) => (
+                            <p key={idx} className="text-xs text-gray-400">
+                              ✓ {feature}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         <div className="buttons-container">
           <button
             className="btn-primary bg-[#a3bd04] text-white"
             onClick={buyNow}
+            disabled={loading || plans.length === 0 || !selectedPlan}
           >
-            Comprar Agora
+            {loading ? "Carregando..." : "Comprar Agora"}
           </button>
           <button className="btn-secondary" onClick={viewAllPlans}>
             Ver Todos os Planos

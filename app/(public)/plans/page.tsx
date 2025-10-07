@@ -16,86 +16,7 @@ import {
   MessageCircle
 } from "lucide-react";
 import { PaymentPlan } from "@/src/types";
-
-const allPlans: PaymentPlan[] = [
-  {
-    id: "single_tip",
-    name: "Palpite Individual",
-    type: "package",
-    price: 9.90,
-    currency: "BRL",
-    tipsIncluded: 1,
-    features: [
-      "1 palpite premium exclusivo",
-      "Análise detalhada completa",
-      "Suporte por 24 horas",
-      "Acesso imediato"
-    ],
-  },
-  {
-    id: "package_5",
-    name: "Pacote 5 Tips",
-    type: "package",
-    price: 39.90,
-    currency: "BRL",
-    tipsIncluded: 5,
-    features: [
-      "5 palpites premium",
-      "Economia de 20%",
-      "Análises detalhadas",
-      "Suporte prioritário",
-      "Validade de 30 dias"
-    ],
-    isPopular: true,
-  },
-  {
-    id: "package_10",
-    name: "Pacote 10 Tips",
-    type: "package",
-    price: 69.90,
-    currency: "BRL",
-    tipsIncluded: 10,
-    features: [
-      "10 palpites premium",
-      "Economia de 30%",
-      "Análises exclusivas",
-      "Suporte VIP",
-      "Validade de 60 dias",
-      "Tips bônus"
-    ],
-  },
-  {
-    id: "weekly",
-    name: "Assinatura Semanal",
-    type: "subscription",
-    price: 29.90,
-    currency: "BRL",
-    duration: 7,
-    features: [
-      "Tips ilimitados por 7 dias",
-      "Análises exclusivas",
-      "Suporte VIP",
-      "Cancelamento livre",
-      "Acesso a grupo VIP"
-    ],
-  },
-  {
-    id: "monthly",
-    name: "Assinatura Mensal",
-    type: "subscription",
-    price: 99.90,
-    currency: "BRL",
-    duration: 30,
-    features: [
-      "Tips ilimitados por 30 dias",
-      "Análises premium exclusivas",
-      "Suporte 24/7",
-      "Cancelamento livre",
-      "Acesso a grupo VIP",
-      "Tips bônus mensais"
-    ],
-  },
-];
+import { usePlans } from "@/src/contexts/PlansContext";
 
 const testimonials = [
   {
@@ -119,7 +40,8 @@ const testimonials = [
 ];
 
 export default function PlansPage() {
-  const [selectedPlan, setSelectedPlan] = useState<string>("package_5");
+  const { plans: allPlans, loading } = usePlans();
+  const [selectedPlan, setSelectedPlan] = useState<string>("");
 
   const handlePurchase = (planId: string) => {
     // Implementar lógica de compra
@@ -129,9 +51,12 @@ export default function PlansPage() {
 
   const getSavings = (plan: PaymentPlan) => {
     if (plan.type === "package" && plan.tipsIncluded && plan.tipsIncluded > 1) {
-      const individualPrice = 9.90;
+      // Encontrar o menor preço de plano individual para calcular economia
+      const singlePlans = allPlans.filter(p => p.type === "package" && p.tipsIncluded === 1);
+      const individualPrice = singlePlans.length > 0 ? singlePlans[0].price / 100 : 9.90;
+      const planPriceInReais = plan.price / 100;
       const totalIndividual = individualPrice * plan.tipsIncluded;
-      const savings = totalIndividual - plan.price;
+      const savings = totalIndividual - planPriceInReais;
       const percentage = Math.round((savings / totalIndividual) * 100);
       return { savings, percentage };
     }
@@ -184,8 +109,18 @@ export default function PlansPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {allPlans.map((plan) => {
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a3bd04] mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Carregando planos...</p>
+          </div>
+        ) : allPlans.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">Nenhum plano disponível no momento</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {allPlans.map((plan) => {
             const savings = getSavings(plan);
             return (
               <div
@@ -213,7 +148,7 @@ export default function PlansPage() {
                   <div className="mb-4">
                     <div className="flex items-baseline justify-center space-x-2">
                       <span className="text-4xl font-bold text-[#a3bd04]">
-                        R$ {plan.price.toFixed(2)}
+                        R$ {(plan.price / 100).toFixed(2).replace(".", ",")}
                       </span>
                       {plan.type === "package" && plan.tipsIncluded && plan.tipsIncluded > 1 && (
                         <span className="text-gray-500 dark:text-gray-400">
@@ -257,9 +192,10 @@ export default function PlansPage() {
                   Escolher Plano
                 </button>
               </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Testimonials */}
