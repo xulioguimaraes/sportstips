@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/src/contexts/AuthContext";
+import LogoCss from "./LogoCss";
+import Image from "next/image";
 
 interface SidebarProps {
   activeTab: string;
@@ -98,8 +100,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       `}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-4 bg-gradient-to-r from-indigo-600 to-purple-600">
-          <h1 className="text-xl font-bold text-white">SportsTips</h1>
+        <div className="relative flex items-center justify-center h-16 px-4 bg-gray-800">
+          <div className="flex items-center justify-center">
+            {/* Logo Sportstips com Tailwind */}
+            <Image
+              src="/images/logo2.png"
+              alt="Logo"
+              className="h-[40px] w-full object-contain scale-[6]" 
+              width={100}
+              height={50}
+            />
+          </div>
           {isMobile && (
             <button
               onClick={() => setIsOpen(false)}
@@ -126,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         {/* User Info */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#a3bd04] rounded-full flex items-center justify-center">
               <span className="text-white font-semibold text-sm">
                 {user?.email?.charAt(0).toUpperCase()}
               </span>
@@ -149,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 onClick={() => handleTabChange(item.id)}
                 className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
                   activeTab === item.id
-                    ? "bg-indigo-50 text-indigo-700 border-r-2 border-indigo-600"
+                    ? "bg-[#a3bd04] text-indigo-700 border-r-2 border-gray-800"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >

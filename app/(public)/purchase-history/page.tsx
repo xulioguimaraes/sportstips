@@ -13,6 +13,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Repeat,
+  Timer,
 } from "lucide-react";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/src/lib/firebase";
@@ -25,7 +27,7 @@ interface Transaction {
   planPrice: number;
   planType: "package" | "subscription";
   paymentMethod: "pix" | "card";
-  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
+  status: "pending" | "processing" | "PAYMENT_RECEIVED" | "failed" | "cancelled";
   pixKeyId?: string;
   pixKey?: string;
   pixQrCode?: string;
@@ -35,8 +37,9 @@ interface Transaction {
 }
 
 const getStatusInfo = (status: string) => {
+  console.log(status);
   switch (status) {
-    case "completed":
+    case "PAYMENT_RECEIVED":
       return {
         icon: CheckCircle,
         color: "text-green-600 dark:text-green-400",
@@ -83,7 +86,7 @@ const getStatusInfo = (status: string) => {
 
 const formatDate = (timestamp: any) => {
   if (!timestamp) return "Data não disponível";
-  
+
   try {
     // Se for um timestamp do Firestore
     if (timestamp.toDate) {
@@ -129,19 +132,26 @@ export default function PurchaseHistoryPage() {
       const transactionsRef = collection(db, "transactions");
       const q = query(
         transactionsRef,
-       
-        orderBy("createdAt", "desc")
+        where("userId", "==", user.email)
       );
 
       const querySnapshot = await getDocs(q);
-      const transactionsData: Transaction[] = [];
 
-      querySnapshot.forEach((doc) => {
-        transactionsData.push({
-          id: doc.id,
-          ...doc.data(),
-        } as Transaction);
-      });
+      // Ordena no cliente em vez de usar orderBy do Firestore
+      const transactionsData = querySnapshot.docs
+        .map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            } as Transaction)
+        )
+        .sort((a, b) => {
+          // Ordena por createdAt em ordem decrescente
+          const dateA = a.createdAt?.toDate?.() || new Date(0);
+          const dateB = b.createdAt?.toDate?.() || new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        });
 
       setTransactions(transactionsData);
     } catch (error) {
@@ -160,7 +170,7 @@ export default function PurchaseHistoryPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-2 py-2">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => router.back()}
@@ -230,12 +240,12 @@ export default function PurchaseHistoryPage() {
               return (
                 <div
                   key={transaction.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
+                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3 mb-3 justify-between">
+                        <div className="flex items-center space-x-2 ">
                           <Package className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                           <h3 className="font-medium text-gray-900 dark:text-white">
                             {transaction.planName}
@@ -256,7 +266,8 @@ export default function PurchaseHistoryPage() {
                             Valor:
                           </span>
                           <span className="font-medium text-[#a3bd04]">
-                            R$ {transaction.planPrice.toFixed(2).replace(".", ",")}
+                            R${" "}
+                            {transaction.planPrice.toFixed(2).replace(".", ",")}
                           </span>
                         </div>
 
@@ -283,27 +294,31 @@ export default function PurchaseHistoryPage() {
 
                       {transaction.planType === "package" && (
                         <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                          <p className="text-sm text-blue-800 dark:text-blue-200">
-                            📦 Pacote único - Acesso liberado após confirmação do pagamento
-                          </p>
+                          <div className="flex items-center space-x-2 text-sm text-blue-800 dark:text-blue-200">
+                            <Package className="w-4 h-4 flex-shrink-0" />
+                            <span>Pacote único - Acesso liberado após confirmação do pagamento</span>
+                          </div>
                         </div>
                       )}
 
                       {transaction.planType === "subscription" && (
                         <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                          <p className="text-sm text-green-800 dark:text-green-200">
-                            📅 Assinatura recorrente - Renovação automática
-                          </p>
+                          <div className="flex items-center space-x-2 text-sm text-green-800 dark:text-green-200">
+                            <Repeat className="w-4 h-4 flex-shrink-0" />
+                            <span>Assinatura recorrente - Renovação automática</span>
+                          </div>
                         </div>
                       )}
 
-                      {transaction.status === "pending" && transaction.pixExpirationDate && (
-                        <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                          <p className="text-sm text-orange-800 dark:text-orange-200">
-                            ⏰ PIX válido até: {formatDate(transaction.pixExpirationDate)}
-                          </p>
-                        </div>
-                      )}
+                      {transaction.status === "pending" &&
+                        transaction.pixExpirationDate && (
+                          <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                            <div className="flex items-center space-x-2 text-sm text-orange-800 dark:text-orange-200">
+                              <Timer className="w-4 h-4 flex-shrink-0" />
+                              <span>PIX válido até: {formatDate(transaction.pixExpirationDate)}</span>
+                            </div>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -314,11 +329,11 @@ export default function PurchaseHistoryPage() {
 
         {/* Estatísticas */}
         {transactions.length > 0 && (
-          <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          <div className="mt-4 mb-24 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Resumo
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-wrap justify-between items-center gap-2">
               <div className="text-center">
                 <div className="text-2xl font-bold text-[#a3bd04]">
                   {transactions.length}
@@ -329,7 +344,7 @@ export default function PurchaseHistoryPage() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {transactions.filter(t => t.status === "completed").length}
+                  {transactions.filter((t) => t.status === "PAYMENT_RECEIVED").length}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Concluídas
@@ -337,8 +352,9 @@ export default function PurchaseHistoryPage() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  R$ {transactions
-                    .filter(t => t.status === "completed")
+                  R${" "}
+                  {transactions
+                    .filter((t) => t.status === "PAYMENT_RECEIVED")
                     .reduce((sum, t) => sum + t.planPrice, 0)
                     .toFixed(2)
                     .replace(".", ",")}

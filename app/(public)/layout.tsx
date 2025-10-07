@@ -81,7 +81,7 @@ function PublicLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="container">
       {/* Logo */}
-      <div className="flex justify-center bg-gray-800 items-center m-1 mb-1">
+      <div className="flex justify-center bg-gray-800 items-center  ">
         <LogoCss />
       </div>
       {/* Conteúdo das páginas */}

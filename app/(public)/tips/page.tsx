@@ -170,7 +170,7 @@ export default function TipsPage() {
   return (
     <>
       {/* Header */}
-      <div className="bg-black rounded-xl p-3 mb-4 text-white mx-2">
+      <div className="bg-gray-800 rounded-b-2xl p-3 mb-4 text-white ">
         <div className="flex items-center space-x-3">
           <Target className="w-8 h-8" />
           <div>

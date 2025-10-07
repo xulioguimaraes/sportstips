@@ -1,6 +1,7 @@
 'use client';
 
 import { Stats } from '@/src/types';
+import LogoCss from './LogoCss';
 
 interface HeaderProps {
   stats: Stats;
@@ -11,7 +12,7 @@ export default function Header({ stats, onNotificationClick }: HeaderProps) {
   return (
     <div className="header">
       <div className="header-top">
-        <div className="logo">SportsTips</div>
+        <LogoCss />
         <button className="notification-btn" onClick={onNotificationClick}>
           🔔
         </button>

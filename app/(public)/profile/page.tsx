@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { user, loading: authLoading, logout } = useAuth();
+  console.log(user);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   // Simular loading de 2 segundos
@@ -62,7 +63,7 @@ export default function ProfilePage() {
   return (
     <>
       {/* Header do Perfil */}
-      <div className="bg-black rounded-xl p-3 mb-4 text-white mx-2">
+      <div className="bg-gray-800 rounded-b-2xl p-3 mb-4 text-white ">
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
             <User className="w-8 h-8" />
@@ -129,7 +130,7 @@ export default function ProfilePage() {
             Compras e Assinaturas
           </h3>
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            {/* <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <div className="flex items-center space-x-3">
                 <Crown className="w-5 h-5 text-yellow-500" />
                 <span className="text-gray-900 dark:text-white">
@@ -142,7 +143,7 @@ export default function ProfilePage() {
                 </span>
                 <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </div>
-            </button>
+            </button> */}
             <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <Link href="/purchase-history" className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
@@ -191,7 +192,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Informações da Conta */}
-      <div className="mt-6 bg-gray-50 dark:bg-gray-700 rounded-xl p-3 mb-24 px-2">
+      <div className="mt-6 bg-gray-50 dark:bg-gray-700 rounded-xl p-3 mb-44 mx-2">
         <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
           Informações da Conta
         </h4>
