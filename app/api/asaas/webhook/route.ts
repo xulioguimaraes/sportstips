@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/src/lib/firebase";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 export async function POST(request: NextRequest) {
   try {
     const webhookData = await request.json();
-    
-    console.log("Webhook recebido do Asaas:", webhookData);
 
     // Verificar se é um evento de pagamento PIX
-    if (webhookData.event === 'PAYMENT_RECEIVED' || webhookData.event === 'PAYMENT_CONFIRMED') {
-      const pixKeyId = webhookData.payment?.pixTransaction?.id || webhookData.payment?.id;
-      
+    if (
+      webhookData.event === "PAYMENT_RECEIVED" ||
+      webhookData.event === "PAYMENT_CONFIRMED"
+    ) {
+      const pixKeyId = webhookData?.payment?.pixQrCodeId;
+
       if (!pixKeyId) {
         console.error("pixKeyId não encontrado no webhook");
         return NextResponse.json(
@@ -21,8 +29,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Buscar transação pelo pixKeyId
-      const transactionsRef = collection(db, 'transactions');
-      const q = query(transactionsRef, where('pixKeyId', '==', pixKeyId));
+      const transactionsRef = collection(db, "transactions");
+      const q = query(transactionsRef, where("pixKeyId", "==", pixKeyId));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
@@ -35,26 +43,29 @@ export async function POST(request: NextRequest) {
 
       // Atualizar status da transação para completed
       const updatePromises = querySnapshot.docs.map(async (docSnapshot) => {
-        const transactionRef = doc(db, 'transactions', docSnapshot.id);
+        const transactionRef = doc(db, "transactions", docSnapshot.id);
         await updateDoc(transactionRef, {
-          status: 'completed',
+          status: webhookData.event,
           updatedAt: new Date(),
           asaasPaymentId: webhookData.payment?.id,
           paymentConfirmedAt: new Date(),
+          payment: webhookData.payment,
         });
         return docSnapshot.id;
       });
 
       const updatedTransactionIds = await Promise.all(updatePromises);
 
-      console.log(`Pagamento confirmado para ${updatedTransactionIds.length} transação(ões) com pixKeyId: ${pixKeyId}`);
+      console.log(
+        `Pagamento confirmado para ${updatedTransactionIds.length} transação(ões) com pixKeyId: ${pixKeyId}`
+      );
 
       return NextResponse.json({
         success: true,
         message: "Webhook processado com sucesso",
         pixKeyId: pixKeyId,
         updatedTransactions: updatedTransactionIds.length,
-        transactionIds: updatedTransactionIds
+        transactionIds: updatedTransactionIds,
       });
     }
 
@@ -63,9 +74,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Webhook recebido mas não processado",
-      event: webhookData.event
+      event: webhookData.event,
     });
-
   } catch (error) {
     console.error("Erro ao processar webhook:", error);
     return NextResponse.json(
@@ -80,6 +90,6 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     message: "Webhook endpoint está funcionando",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }

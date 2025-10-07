@@ -261,7 +261,7 @@ export default function CheckoutPage() {
 
         // Salvar transação no Firestore
         const transactionId = await saveTransaction({
-          userId: user!.uid,
+          userId: user!.email,
           planId: planData.id,
           planName: planData.name,
           planPrice: planData.price,
