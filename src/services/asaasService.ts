@@ -1,11 +1,8 @@
 // Serviço para integração com a API do Asaas
 // Documentação: https://docs.asaas.com/
 
-const ASAAS_API_URL =
-  process.env.NEXT_PUBLIC_ASAAS_API_URL || "https://api.asaas.com/v3";
-const ASAAS_API_KEY =
-  process.env.NEXT_PUBLIC_ASAAS_API_KEY ||
-  "$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjkxZTgxYWRlLWI4YjMtNDNjYi04ZTQzLTE1NjAxMDMyMzI4ZTo6JGFhY2hfYzgxY2EwM2QtODJkMS00NDhkLTgzNWQtMmYyMTVmM2UxYzE4";
+// Nota: As variáveis ASAAS_API_URL e ASAAS_API_KEY não são mais necessárias aqui
+// pois todas as chamadas para a API do Asaas agora são feitas através das API routes do Next.js
 
 interface AsaasCustomer {
   name: string;
@@ -110,17 +107,17 @@ export const createSubscription = async (
   subscriptionData: AsaasSubscription
 ): Promise<AsaasResponse> => {
   try {
-    const response = await fetch(`${ASAAS_API_URL}/subscriptions`, {
+    const response = await fetch('/api/asaas/subscriptions', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        access_token: ASAAS_API_KEY,
       },
       body: JSON.stringify(subscriptionData),
     });
 
     if (!response.ok) {
-      throw new Error(`Erro ao criar assinatura: ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erro ao criar assinatura: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -136,18 +133,13 @@ export const getPixQrCode = async (
   paymentId: string
 ): Promise<{ qrCode: string; payload: string }> => {
   try {
-    const response = await fetch(
-      `${ASAAS_API_URL}/payments/${paymentId}/pixQrCode`,
-      {
-        method: "GET",
-        headers: {
-          access_token: ASAAS_API_KEY,
-        },
-      }
-    );
+    const response = await fetch(`/api/asaas/payments/${paymentId}/pixQrCode`, {
+      method: "GET",
+    });
 
     if (!response.ok) {
-      throw new Error(`Erro ao obter QR Code PIX: ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erro ao obter QR Code PIX: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -193,11 +185,10 @@ export const processCardPayment = async (paymentData: {
   try {
     // Esta função seria implementada com a integração real do cartão
     // Por enquanto, simulamos o processo
-    const response = await fetch(`${ASAAS_API_URL}/payments`, {
+    const response = await fetch('/api/asaas/payments', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        access_token: ASAAS_API_KEY,
       },
       body: JSON.stringify({
         customer: paymentData.customerId,
@@ -214,8 +205,9 @@ export const processCardPayment = async (paymentData: {
     });
 
     if (!response.ok) {
+      const errorData = await response.json();
       throw new Error(
-        `Erro ao processar pagamento com cartão: ${response.statusText}`
+        errorData.error || `Erro ao processar pagamento com cartão: ${response.statusText}`
       );
     }
 
@@ -274,22 +266,19 @@ export const createPixKey = async (
   keyType: "CPF" | "CNPJ" | "EMAIL" | "PHONE" | "RANDOM"
 ): Promise<{ id: string; key: string }> => {
   try {
-    const response = await fetch(
-      `${ASAAS_API_URL}/customers/${customerId}/pixKeys`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          access_token: ASAAS_API_KEY,
-        },
-        body: JSON.stringify({
-          type: keyType,
-        }),
-      }
-    );
+    const response = await fetch(`/api/asaas/customers/${customerId}/pixKeys`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: keyType,
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Erro ao criar chave PIX: ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erro ao criar chave PIX: ${response.statusText}`);
     }
 
     const data = await response.json();

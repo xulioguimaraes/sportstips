@@ -22,7 +22,7 @@ interface PlanData {
   name: string;
   price: number;
   description: string;
-  type: 'package' | 'subscription';
+  type: "package" | "subscription";
 }
 
 interface PixModalProps {
@@ -36,7 +36,15 @@ interface PixModalProps {
 }
 
 // Componente do Modal PIX
-const PixModal: React.FC<PixModalProps> = ({ isOpen, onClose, pixCode, amount, qrCodeImage, expirationDate, onPaymentComplete }) => {
+const PixModal: React.FC<PixModalProps> = ({
+  isOpen,
+  onClose,
+  pixCode,
+  amount,
+  qrCodeImage,
+  expirationDate,
+  onPaymentComplete,
+}) => {
   const [copied, setCopied] = useState(false);
 
   const copyPixCode = () => {
@@ -64,11 +72,14 @@ const PixModal: React.FC<PixModalProps> = ({ isOpen, onClose, pixCode, amount, q
 
         <div className="text-center mb-4">
           <p className="text-gray-600 dark:text-gray-400 mb-2">
-            Valor: <span className="font-bold text-[#a3bd04]">R$ {amount.toFixed(2).replace(".", ",")}</span>
+            Valor:{" "}
+            <span className="font-bold text-[#a3bd04]">
+              R$ {amount.toFixed(2).replace(".", ",")}
+            </span>
           </p>
           {expirationDate && (
             <p className="text-sm text-orange-600 dark:text-orange-400">
-              ⏰ Válido até: {new Date(expirationDate).toLocaleString('pt-BR')}
+              ⏰ Válido até: {new Date(expirationDate).toLocaleString("pt-BR")}
             </p>
           )}
         </div>
@@ -78,9 +89,9 @@ const PixModal: React.FC<PixModalProps> = ({ isOpen, onClose, pixCode, amount, q
           <div className="text-center">
             <div className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 inline-block">
               {qrCodeImage ? (
-                <Image 
-                  src={`data:image/png;base64,${qrCodeImage}`} 
-                  alt="QR Code PIX" 
+                <Image
+                  src={`data:image/png;base64,${qrCodeImage}`}
+                  alt="QR Code PIX"
                   width={128}
                   height={128}
                   className="mx-auto"
@@ -109,9 +120,9 @@ const PixModal: React.FC<PixModalProps> = ({ isOpen, onClose, pixCode, amount, q
               <button
                 onClick={copyPixCode}
                 className={`px-4 py-2 rounded-r-lg transition-colors duration-200 ${
-                  copied 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
+                  copied
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500"
                 }`}
               >
                 <Copy className="w-4 h-4" />
@@ -168,10 +179,6 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
-  // Debug: monitorar mudanças no usuário
-  useEffect(() => {
-    console.log('Usuário mudou:', !!user, user?.email);
-  }, [user]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "pix" | "card"
   >("pix");
@@ -188,65 +195,70 @@ export default function CheckoutPage() {
   const [pendingPayment, setPendingPayment] = useState(false);
 
   // Determinar o tipo de plano baseado no ID
-  const getPlanType = (planId: string): 'package' | 'subscription' => {
-    if (planId === 'weekly') return 'subscription';
-    return 'package';
+  const getPlanType = (planId: string): "package" | "subscription" => {
+    if (planId === "weekly") return "subscription";
+    return "package";
   };
 
-  const planData: PlanData = useMemo(() => ({
-    id: searchParams.get("plan") || "",
-    name: decodeURIComponent(searchParams.get("name") || ""),
-    price: parseFloat(searchParams.get("price") || "0"),
-    description: "",
-    type: getPlanType(searchParams.get("plan") || ""),
-  }), [searchParams]);
+  const planData: PlanData = useMemo(
+    () => ({
+      id: searchParams.get("plan") || "",
+      name: decodeURIComponent(searchParams.get("name") || ""),
+      price: parseFloat(searchParams.get("price") || "0"),
+      description: "",
+      type: getPlanType(searchParams.get("plan") || ""),
+    }),
+    [searchParams]
+  );
 
   // Determinar métodos de pagamento disponíveis baseado no tipo de plano
-  const availablePaymentMethods = planData.type === 'subscription' 
-    ? ['card'] // Apenas cartão para assinaturas
-    : ['pix']; // Apenas PIX para pacotes
+  const availablePaymentMethods =
+    planData.type === "subscription"
+      ? ["card"] // Apenas cartão para assinaturas
+      : ["pix"]; // Apenas PIX para pacotes
 
   // Definir método padrão baseado no tipo de plano
   useEffect(() => {
-    if (planData.type === 'subscription') {
-      setSelectedPaymentMethod('card');
+    if (planData.type === "subscription") {
+      setSelectedPaymentMethod("card");
     } else {
-      setSelectedPaymentMethod('pix');
+      setSelectedPaymentMethod("pix");
     }
   }, [planData.type]);
 
   // Remover geração mock do PIX - agora usamos API real
 
   const handlePayment = async () => {
-    console.log('handlePayment chamado, user:', !!user);
+    console.log("handlePayment chamado, user:", !!user);
     if (!user) {
-      console.log('Usuário não logado, abrindo modal...');
+      console.log("Usuário não logado, abrindo modal...");
       setPendingPayment(true);
       setShowAuthModal(true);
       return;
     }
 
-    console.log('Usuário logado, processando pagamento...');
+    console.log("Usuário logado, processando pagamento...");
     await processPayment();
   };
 
   const processPayment = useCallback(async () => {
-    console.log('processPayment chamado, user:', !!user);
+    console.log("processPayment chamado, user:", !!user);
     if (selectedPaymentMethod === "pix") {
       // Para PIX, gerar chave PIX e salvar transação
       setIsLoading(true);
-      
+
       try {
         // Chave PIX fixa - você pode tornar isso dinâmico se necessário
         const addressKey = "00e90a64-45d4-46e4-b109-23f52be1897f";
-        
+        //const addressKey = "94a7ec81-c3e6-46ac-83f4-f8c7a9a79de7";
+
         // Criar chave PIX EVP via API do Asaas
         const pixData = await createPixEVPKey(
           planData.price,
           planData.name,
           addressKey
         );
-        
+
         // Salvar transação no Firestore
         const transactionId = await saveTransaction({
           userId: user!.uid,
@@ -254,13 +266,13 @@ export default function CheckoutPage() {
           planName: planData.name,
           planPrice: planData.price,
           planType: planData.type,
-          paymentMethod: 'pix',
+          paymentMethod: "pix",
           pixKeyId: pixData.id,
           pixKey: addressKey,
           pixQrCode: pixData.encodedImage,
           pixPayload: pixData.payload,
           pixExpirationDate: pixData.expirationDate,
-          status: 'pending',
+          status: "pending",
         });
 
         setTransactionId(transactionId);
@@ -269,22 +281,21 @@ export default function CheckoutPage() {
         setPixExpirationDate(pixData.expirationDate);
         setShowPixModal(true);
         setIsLoading(false);
-        
       } catch (error) {
-        console.error('Erro ao gerar PIX:', error);
-        alert('Erro ao gerar código PIX. Tente novamente.');
+        console.error("Erro ao gerar PIX:", error);
+        alert("Erro ao gerar código PIX. Tente novamente.");
         setIsLoading(false);
       }
     } else if (selectedPaymentMethod === "card") {
       // Para cartão, processar pagamento via Asaas
       setIsLoading(true);
       setPaymentStatus("processing");
-      
+
       try {
         // Aqui você integraria com a API do Asaas para cartão
         await processCardPayment();
       } catch (error) {
-        console.error('Erro no pagamento:', error);
+        console.error("Erro no pagamento:", error);
         setIsLoading(false);
         setPaymentStatus("pending");
       }
@@ -293,41 +304,42 @@ export default function CheckoutPage() {
 
   // Função separada para pagamento após login
   const handlePaymentAfterLogin = useCallback(async () => {
-    console.log('handlePaymentAfterLogin chamado, user:', !!user);
+    console.log("handlePaymentAfterLogin chamado, user:", !!user);
     if (!user) {
-      console.log('Usuário ainda não está logado');
+      console.log("Usuário ainda não está logado");
       return;
     }
 
     if (selectedPaymentMethod === "pix") {
       // Para PIX, gerar chave PIX e salvar transação
       setIsLoading(true);
-      
+
       try {
         // Chave PIX fixa - você pode tornar isso dinâmico se necessário
         const addressKey = "00e90a64-45d4-46e4-b109-23f52be1897f";
-        
+
         // Criar chave PIX EVP via API do Asaas
         const pixData = await createPixEVPKey(
           planData.price,
           planData.name,
           addressKey
         );
-        
+        console.log({ pixData });
+        console.log({ user });
         // Salvar transação no Firestore
         const transactionId = await saveTransaction({
-          userId: user.uid,
+          userId: user.email,
           planId: planData.id,
           planName: planData.name,
           planPrice: planData.price,
           planType: planData.type,
-          paymentMethod: 'pix',
+          paymentMethod: "pix",
           pixKeyId: pixData.id,
           pixKey: addressKey,
           pixQrCode: pixData.encodedImage,
           pixPayload: pixData.payload,
           pixExpirationDate: pixData.expirationDate,
-          status: 'pending',
+          status: "pending",
         });
 
         setTransactionId(transactionId);
@@ -336,22 +348,21 @@ export default function CheckoutPage() {
         setPixExpirationDate(pixData.expirationDate);
         setShowPixModal(true);
         setIsLoading(false);
-        
       } catch (error) {
-        console.error('Erro ao gerar PIX:', error);
-        alert('Erro ao gerar código PIX. Tente novamente.');
+        console.error("Erro ao gerar PIX:", error);
+        alert("Erro ao gerar código PIX. Tente novamente.");
         setIsLoading(false);
       }
     } else if (selectedPaymentMethod === "card") {
       // Para cartão, processar pagamento via Asaas
       setIsLoading(true);
       setPaymentStatus("processing");
-      
+
       try {
         // Aqui você integraria com a API do Asaas para cartão
         await processCardPayment();
       } catch (error) {
-        console.error('Erro no pagamento:', error);
+        console.error("Erro no pagamento:", error);
         setIsLoading(false);
         setPaymentStatus("pending");
       }
@@ -361,7 +372,7 @@ export default function CheckoutPage() {
   // Executar pagamento pendente quando usuário fizer login
   useEffect(() => {
     if (user && pendingPayment) {
-      console.log('Usuário logado, executando pagamento pendente...');
+      console.log("Usuário logado, executando pagamento pendente...");
       setPendingPayment(false);
       // Usar setTimeout para garantir que o estado foi atualizado
       setTimeout(() => {
@@ -373,7 +384,7 @@ export default function CheckoutPage() {
   // Monitorar quando o modal é fechado e usuário está logado
   useEffect(() => {
     if (user && !showAuthModal && pendingPayment) {
-      console.log('Modal fechado e usuário logado, executando pagamento...');
+      console.log("Modal fechado e usuário logado, executando pagamento...");
       setPendingPayment(false);
       setTimeout(() => {
         handlePaymentAfterLogin();
@@ -393,18 +404,18 @@ export default function CheckoutPage() {
     setShowPixModal(false);
     setIsLoading(true);
     setPaymentStatus("processing");
-    
+
     try {
       // Aqui você atualizaria o status da transação no Firestore
       // await updateTransactionStatus(transactionId, 'processing');
-      
+
       // Simular confirmação do pagamento PIX
       setTimeout(() => {
         setPaymentStatus("completed");
         setIsLoading(false);
       }, 2000);
     } catch (error) {
-      console.error('Erro ao confirmar pagamento:', error);
+      console.error("Erro ao confirmar pagamento:", error);
       setIsLoading(false);
       setPaymentStatus("pending");
     }
@@ -490,7 +501,7 @@ export default function CheckoutPage() {
 
             {/* Seleção de Método */}
             <div className="space-y-3 mb-2">
-              {availablePaymentMethods.includes('pix') && (
+              {availablePaymentMethods.includes("pix") && (
                 <label className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                   <input
                     type="radio"
@@ -511,7 +522,7 @@ export default function CheckoutPage() {
                 </label>
               )}
 
-              {availablePaymentMethods.includes('card') && (
+              {availablePaymentMethods.includes("card") && (
                 <label className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                   <input
                     type="radio"
@@ -536,10 +547,9 @@ export default function CheckoutPage() {
             {/* Informação sobre o tipo de plano */}
             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                {planData.type === 'subscription' 
-                  ? '📅 Este é um plano recorrente. Pagamento será cobrado automaticamente.'
-                  : '📦 Este é um pacote único. Pagamento único via PIX.'
-                }
+                {planData.type === "subscription"
+                  ? "📅 Este é um plano recorrente. Pagamento será cobrado automaticamente."
+                  : "📦 Este é um pacote único. Pagamento único via PIX."}
               </p>
             </div>
 
@@ -578,7 +588,7 @@ export default function CheckoutPage() {
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => {
-            console.log('Modal fechado');
+            console.log("Modal fechado");
             setShowAuthModal(false);
             // Não limpar pendingPayment aqui, deixar o useEffect gerenciar
           }}

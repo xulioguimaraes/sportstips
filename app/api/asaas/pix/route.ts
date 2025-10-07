@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ASAAS_API_URL = process.env.NEXT_PUBLIC_ASAAS_API_URL;
+const ASAAS_API_URL =
+  process.env.NEXT_PUBLIC_ASAAS_API_URL || "https://api.asaas.com/v3";
 const ASAAS_API_KEY = process.env.NEXT_PUBLIC_ASAAS_API_KEY;
+
 export async function POST(request: NextRequest) {
   try {
+    console.log(request.json());
     const { value, description, addressKey } = await request.json();
 
     // Validar dados obrigatórios
@@ -23,7 +26,7 @@ export async function POST(request: NextRequest) {
       .toISOString()
       .replace("T", " ")
       .replace(/\.\d{3}Z$/, "");
-
+    console.log(ASAAS_API_KEY);
     // Fazer requisição para o Asaas
     const response = await fetch(`${ASAAS_API_URL}/pix/qrCodes/static`, {
       method: "POST",

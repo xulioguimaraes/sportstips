@@ -144,25 +144,27 @@ export default function ProfilePage() {
               </div>
             </button>
             <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-              <div className="flex items-center space-x-3">
-                <CreditCard className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                <span className="text-gray-900 dark:text-white">
-                  Histórico de Compras
-                </span>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <Link href="/purchase-history" className="flex items-center justify-between w-full">
+                <div className="flex items-center space-x-3">
+                  <CreditCard className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                  <span className="text-gray-900 dark:text-white">
+                    Histórico de Compras
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              </Link>
             </button>
-            <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-              <div className="flex items-center space-x-3">
-                <Target className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                <Link href="/tips">
+            <Link href="/tips">
+              <button className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <Target className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   <span className="text-gray-900 dark:text-white">
                     Meus Tips Comprados
                   </span>
-                </Link>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-            </button>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              </button>
+            </Link>
           </div>
         </div>
 
