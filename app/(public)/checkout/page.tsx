@@ -13,9 +13,9 @@ import {
   X,
 } from "lucide-react";
 import { createPixEVPKey } from "@/src/services/asaasService";
-import { saveTransaction } from "@/src/services/transactionService";
 import { useAuth } from "@/src/contexts/AuthContext";
 import AuthModal from "@/src/components/AuthModal";
+import { usePlans } from "@/src/contexts/PlansContext";
 
 interface PlanData {
   id: string;
@@ -178,6 +178,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { plans, loading: plansLoading } = usePlans();
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "pix" | "card"
@@ -194,88 +195,62 @@ export default function CheckoutPage() {
   const [transactionId, setTransactionId] = useState<string>("");
   const [pendingPayment, setPendingPayment] = useState(false);
 
-  // Determinar o tipo de plano baseado no ID
-  const getPlanType = (planId: string): "package" | "subscription" => {
-    if (planId === "weekly") return "subscription";
-    return "package";
-  };
+  // Buscar plano da lista de planos usando o ID da URL
+  const planId = searchParams.get("plan") || "";
+  const planData: PlanData | null = useMemo(() => {
+    if (!planId || plansLoading || plans.length === 0) return null;
 
-  const planData: PlanData = useMemo(
-    () => ({
-      id: searchParams.get("plan") || "",
-      name: decodeURIComponent(searchParams.get("name") || ""),
-      price: parseFloat(searchParams.get("price") || "0"),
+    const plan = plans.find((p) => p.id === planId);
+    if (!plan) return null;
+
+    return {
+      id: plan.id,
+      name: plan.name,
+      price: plan.price / 100, // Converter centavos para reais
       description: "",
-      type: getPlanType(searchParams.get("plan") || ""),
-    }),
-    [searchParams]
-  );
+      type: plan.type,
+    };
+  }, [planId, plans, plansLoading]);
 
   // Determinar métodos de pagamento disponíveis baseado no tipo de plano
   const availablePaymentMethods =
-    planData.type === "subscription"
+    planData?.type === "subscription"
       ? ["card"] // Apenas cartão para assinaturas
       : ["pix"]; // Apenas PIX para pacotes
 
   // Definir método padrão baseado no tipo de plano
   useEffect(() => {
-    if (planData.type === "subscription") {
+    if (planData?.type === "subscription") {
       setSelectedPaymentMethod("card");
     } else {
       setSelectedPaymentMethod("pix");
     }
-  }, [planData.type]);
+  }, [planData?.type]);
 
   // Remover geração mock do PIX - agora usamos API real
 
   const handlePayment = async () => {
-    console.log("handlePayment chamado, user:", !!user);
     if (!user) {
-      console.log("Usuário não logado, abrindo modal...");
       setPendingPayment(true);
       setShowAuthModal(true);
       return;
     }
 
-    console.log("Usuário logado, processando pagamento...");
     await processPayment();
   };
 
   const processPayment = useCallback(async () => {
-    console.log("processPayment chamado, user:", !!user);
+    if (!planData || !user) return;
+
     if (selectedPaymentMethod === "pix") {
-      // Para PIX, gerar chave PIX e salvar transação
+      // Para PIX, a API agora cuida de buscar o plano e salvar a transação
       setIsLoading(true);
 
       try {
-        // Chave PIX fixa - você pode tornar isso dinâmico se necessário
-        const addressKey = "00e90a64-45d4-46e4-b109-23f52be1897f";
-        //const addressKey = "94a7ec81-c3e6-46ac-83f4-f8c7a9a79de7";
+        // Criar chave PIX EVP via API do Asaas (passa planId e userId)
+        const pixData = await createPixEVPKey(planData.id, user.email);
 
-        // Criar chave PIX EVP via API do Asaas
-        const pixData = await createPixEVPKey(
-          planData.price,
-          planData.name,
-          addressKey
-        );
-
-        // Salvar transação no Firestore
-        const transactionId = await saveTransaction({
-          userId: user!.email,
-          planId: planData.id,
-          planName: planData.name,
-          planPrice: planData.price,
-          planType: planData.type,
-          paymentMethod: "pix",
-          pixKeyId: pixData.id,
-          pixKey: addressKey,
-          pixQrCode: pixData.encodedImage,
-          pixPayload: pixData.payload,
-          pixExpirationDate: pixData.expirationDate,
-          status: "pending",
-        });
-
-        setTransactionId(transactionId);
+        setTransactionId(pixData.transactionId);
         setPixCode(pixData.payload);
         setQrCodeImage(pixData.encodedImage);
         setPixExpirationDate(pixData.expirationDate);
@@ -304,45 +279,19 @@ export default function CheckoutPage() {
 
   // Função separada para pagamento após login
   const handlePaymentAfterLogin = useCallback(async () => {
-    console.log("handlePaymentAfterLogin chamado, user:", !!user);
-    if (!user) {
-      console.log("Usuário ainda não está logado");
+    if (!user || !planData) {
       return;
     }
 
     if (selectedPaymentMethod === "pix") {
-      // Para PIX, gerar chave PIX e salvar transação
+      // Para PIX, a API agora cuida de buscar o plano e salvar a transação
       setIsLoading(true);
 
       try {
-        // Chave PIX fixa - você pode tornar isso dinâmico se necessário
-        const addressKey = "00e90a64-45d4-46e4-b109-23f52be1897f";
+        // Criar chave PIX EVP via API do Asaas (passa planId e userId)
+        const pixData = await createPixEVPKey(planData.id, user.email);
 
-        // Criar chave PIX EVP via API do Asaas
-        const pixData = await createPixEVPKey(
-          planData.price,
-          planData.name,
-          addressKey
-        );
-        console.log({ pixData });
-        console.log({ user });
-        // Salvar transação no Firestore
-        const transactionId = await saveTransaction({
-          userId: user.email,
-          planId: planData.id,
-          planName: planData.name,
-          planPrice: planData.price,
-          planType: planData.type,
-          paymentMethod: "pix",
-          pixKeyId: pixData.id,
-          pixKey: addressKey,
-          pixQrCode: pixData.encodedImage,
-          pixPayload: pixData.payload,
-          pixExpirationDate: pixData.expirationDate,
-          status: "pending",
-        });
-
-        setTransactionId(transactionId);
+        setTransactionId(pixData.transactionId);
         setPixCode(pixData.payload);
         setQrCodeImage(pixData.encodedImage);
         setPixExpirationDate(pixData.expirationDate);
@@ -372,7 +321,6 @@ export default function CheckoutPage() {
   // Executar pagamento pendente quando usuário fizer login
   useEffect(() => {
     if (user && pendingPayment) {
-      console.log("Usuário logado, executando pagamento pendente...");
       setPendingPayment(false);
       // Usar setTimeout para garantir que o estado foi atualizado
       setTimeout(() => {
@@ -384,7 +332,6 @@ export default function CheckoutPage() {
   // Monitorar quando o modal é fechado e usuário está logado
   useEffect(() => {
     if (user && !showAuthModal && pendingPayment) {
-      console.log("Modal fechado e usuário logado, executando pagamento...");
       setPendingPayment(false);
       setTimeout(() => {
         handlePaymentAfterLogin();
@@ -424,6 +371,43 @@ export default function CheckoutPage() {
   const goBack = () => {
     router.back();
   };
+
+  // Loading state
+  if (plansLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a3bd04] mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Carregando plano...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Plano não encontrado
+  if (!planData) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Plano não encontrado
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            O plano selecionado não foi encontrado. Por favor, selecione um
+            plano válido.
+          </p>
+          <button
+            onClick={() => router.push("/plans")}
+            className="w-full bg-[#a3bd04] text-white font-semibold py-3 px-6 rounded-lg hover:bg-[#8fa003] transition-colors duration-200"
+          >
+            Ver Planos
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (paymentStatus === "completed") {
     return (
@@ -588,7 +572,6 @@ export default function CheckoutPage() {
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => {
-            console.log("Modal fechado");
             setShowAuthModal(false);
             // Não limpar pendingPayment aqui, deixar o useEffect gerenciar
           }}

@@ -2,18 +2,7 @@
 
 import React, { useState } from "react";
 import { TipFormData, Odds } from "@/src/types";
-import {
-  Save,
-  X,
-  Plus,
-  Trash2,
-  Star,
-  Target,
-  Calendar,
-  Users,
-  Trophy,
-  TrendingUp,
-} from "lucide-react";
+import { Save, X, Plus, Trash2 } from "lucide-react";
 
 interface TipFormProps {
   onSubmit: (tipData: TipFormData) => Promise<void>;

@@ -14,7 +14,7 @@ import TipCard from "@/src/components/TipCard";
 import { Target } from "lucide-react";
 import dynamic from "next/dynamic";
 
-const PlansManagement = dynamic(() => import("../plans/page"), {
+const PlansManagement = dynamic(() => import("../plans-management/page"), {
   ssr: false,
 });
 
@@ -169,7 +169,7 @@ const Dashboard: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8 bg-[#0D1B2A]">
+        <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8 bg-[#0D1B2A] h-screen">
           <div className="mb-6">
             <button
               onClick={() => {
@@ -373,7 +373,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8 bg-[#0D1B2A]">
+      <div className="lg:ml-64 p-4 lg:p-8 pt-8 lg:pt-8 bg-[#0D1B2A] h-screen">
         {renderContent()}
       </div>
     </div>

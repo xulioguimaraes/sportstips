@@ -38,16 +38,11 @@ export default function PurchaseModalV2({
 
   const buyNow = () => {
     const selectedPlanData = plans.find((plan) => plan.id === selectedPlan);
+    console.log(selectedPlanData);
     onClose();
-    // Redirecionar para checkout com dados do plano
+    // Redirecionar para checkout apenas com ID do plano
     if (selectedPlanData) {
-      // Converter centavos para reais
-      const priceInReais = selectedPlanData.price / 100;
-      router.push(
-        `/checkout?plan=${selectedPlan}&price=${priceInReais}&name=${encodeURIComponent(
-          selectedPlanData.name
-        )}`
-      );
+      router.push(`/checkout?plan=${selectedPlan}`);
     }
   };
 

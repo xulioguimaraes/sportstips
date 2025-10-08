@@ -221,9 +221,8 @@ export const processCardPayment = async (paymentData: {
 
 // Função para criar chave PIX EVP (Endereço Virtual de Pagamento)
 export const createPixEVPKey = async (
-  value: number,
-  description: string,
-  addressKey: string
+  planId: string,
+  userId: string
 ): Promise<{
   id: string;
   encodedImage: string;
@@ -232,6 +231,7 @@ export const createPixEVPKey = async (
   expirationDate: string;
   externalReference: string | null;
   description: string;
+  transactionId: string;
 }> => {
   try {
     // Usar API route do Next.js para evitar problemas de CORS
@@ -241,9 +241,8 @@ export const createPixEVPKey = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        value: value,
-        description: description,
-        addressKey: addressKey,
+        planId: planId,
+        userId: userId,
       }),
     });
 

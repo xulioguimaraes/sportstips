@@ -1,6 +1,6 @@
 export interface Tip {
   id: string;
-  category: 'premium' | 'football' | 'basketball' | 'tennis';
+  category: 'football' | 'basketball' | 'tennis';
   league: string;
   teams: string;
   matchTime: string;

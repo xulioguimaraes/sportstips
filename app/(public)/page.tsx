@@ -3,103 +3,18 @@
 import { useState, useEffect, useCallback } from "react";
 import FilterTabs from "@/src/components/FilterTabs";
 import FloatingActionButton from "@/src/components/FloatingActionButton";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { Tip, Stats, FilterTab } from "@/src/types";
+import { Tip, FilterTab } from "@/src/types";
 import { tipsService } from "@/src/services/tipsService";
 import TipCardPublic from "@/src/components/TipCardPublic";
 import DatePicker from "@/src/components/DatePicker";
-import PurchaseModal from "@/src/components/PurchaseModal";
 import PurchaseModalV2 from "@/src/components/PurchaseModalV2";
 import { Target } from "lucide-react";
 
-// Mock data
-const initialStats: Stats = {
-  accuracy: 89,
-  todayCount: 42,
-  roi: 18,
-};
-
-const initialTips: Tip[] = [
-  {
-    id: "1",
-    category: "premium",
-    league: "Premier League",
-    teams: "Liverpool vs Chelsea",
-    matchTime: "Hoje às 16:30",
-    prediction: "Mais de 2.5 Gols",
-    isPremium: true,
-    odds: [
-      { house: "Bet365", value: 1.83 },
-      { house: "Betano", value: 1.87 },
-      { house: "Melhor", value: 1.92, isBest: true },
-    ],
-  },
-  {
-    id: "2",
-    category: "football",
-    league: "La Liga",
-    teams: "Barcelona vs Real Madrid",
-    matchTime: "Hoje às 21:00",
-    prediction: "Ambas Marcam",
-    confidence: 94,
-    isPremium: false,
-    odds: [
-      { house: "Bet365", value: 1.7 },
-      { house: "Betano", value: 1.73 },
-      { house: "Melhor", value: 1.78, isBest: true },
-    ],
-  },
-  {
-    id: "3",
-    category: "basketball",
-    league: "NBA",
-    teams: "Lakers vs Warriors",
-    matchTime: "Hoje às 02:30",
-    prediction: "Mais de 220.5 Pontos",
-    confidence: 87,
-    isPremium: false,
-    odds: [
-      { house: "Bet365", value: 1.91 },
-      { house: "Betano", value: 1.95, isBest: true },
-      { house: "Outros", value: 1.88 },
-    ],
-  },
-  {
-    id: "4",
-    category: "tennis",
-    league: "ATP Masters",
-    teams: "Djokovic vs Nadal",
-    matchTime: "Amanhã às 14:00",
-    prediction: "Djokovic Vence",
-    confidence: 91,
-    isPremium: false,
-    odds: [
-      { house: "Bet365", value: 2.1 },
-      { house: "Betano", value: 2.05 },
-      { house: "Melhor", value: 2.15, isBest: true },
-    ],
-  },
-];
-
-const initialFilterTabs: FilterTab[] = [
-  { id: "all", label: "Todos", category: "all", isActive: true },
-  { id: "premium", label: "Premium", category: "premium", isActive: false },
-  { id: "football", label: "Futebol", category: "football", isActive: false },
-  {
-    id: "basketball",
-    label: "Basquete",
-    category: "basketball",
-    isActive: false,
-  },
-  { id: "tennis", label: "Tênis", category: "tennis", isActive: false },
-];
-
 export default function Home() {
-  const { user } = useAuth();
   const [tips, setTips] = useState<Tip[]>([]);
   const [filteredTips, setFilteredTips] = useState<Tip[]>([]);
-  const [filterTabs, setFilterTabs] = useState<FilterTab[]>(initialFilterTabs);
-  const [stats, setStats] = useState<Stats>(initialStats);
+  const [filterTabs, setFilterTabs] = useState<FilterTab[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -123,27 +38,12 @@ export default function Home() {
         setFilteredTips(tipsData);
 
         // Update stats based on real data
-        const totalTips = tipsData.length;
-        const completedTips = tipsData.filter(
-          (tip) => tip.status === "completed"
-        );
-        const winTips = completedTips.filter((tip) => tip.result === "win");
-        const winRate =
-          completedTips.length > 0
-            ? Math.round((winTips.length / completedTips.length) * 100)
-            : 0;
-
-        setStats({
-          accuracy: winRate,
-          todayCount: totalTips,
-          roi: winRate > 0 ? Math.round(winRate * 0.2) : 0, // Simulated ROI
-        });
       } catch (err) {
         console.error("Erro ao carregar palpites:", err);
         setError("Erro ao carregar palpites. Tente novamente.");
         // Fallback to mock data
-        setTips(initialTips);
-        setFilteredTips(initialTips);
+        setTips([]);
+        setFilteredTips([]);
       } finally {
         setLoading(false);
       }
@@ -234,7 +134,7 @@ export default function Home() {
     <>
       <FilterTabs tabs={filterTabs} onFilterChange={handleFilterChange} />
 
-      <div className="px-2">
+      <div className="px-2 pb-24">
         <div className="flex justify-between items-center m-1 mb-1">
           <div className="text-lg font-bold whitespace-nowrap pr-6">
             Palpites de
