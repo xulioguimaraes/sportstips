@@ -1,8 +1,11 @@
 "use client";
 
 import { Tip } from "@/src/types";
-import { Clock, Star, Target, Lock, ArrowRight } from "lucide-react";
+import { Clock, Star, Target, Lock, ArrowRight, Crown } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import ConfirmTipPurchaseModal from "./ConfirmTipPurchaseModal";
 
 interface TipCardPublicProps {
   tip: Tip;
@@ -15,17 +18,72 @@ export default function TipCardPublic({
   onClick,
   onPremiumClick,
 }: TipCardPublicProps) {
+  console.log({ tip });
   const [isHovered, setIsHovered] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
+  const tipsIsPurchased = user?.purchasedTips?.includes(tip.id);
+
+  const availablePackage = user?.packages?.find((pkg) => pkg.tipsRemaining > 0);
+  const canUsePackage = !!availablePackage;
 
   const handleClick = () => {
+    // Se o tip já foi comprado, redirecionar para página de detalhes
+    if (tipsIsPurchased) {
+      router.push(`/tip/${tip.id}`);
+      return;
+    }
+
+    if (canUsePackage && tip.isPremium) {
+      // Se tem pacote disponível e o tip é premium, mostrar modal de confirmação
+      setShowConfirmModal(true);
+      return;
+    }
+
     if (tip.isPremium) {
-      // Se for premium, direcionar para checkout
+      // Se for premium mas não tem pacote, direcionar para checkout
       if (onPremiumClick) {
         onPremiumClick(tip);
       }
     } else {
       // Se não for premium, mostrar detalhes
       onClick(tip);
+    }
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!user?.email || !tip.id) return;
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/tips/purchase", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.email,
+          tipId: tip.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erro ao comprar tip");
+      }
+
+      // Sucesso - redirecionar para página de detalhes do tip
+      setShowConfirmModal(false);
+      router.push(`/tip/${tip.id}`);
+    } catch (error: any) {
+      console.error("Erro ao comprar tip:", error);
+      alert(error.message || "Erro ao processar compra. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,7 +170,12 @@ export default function TipCardPublic({
         </div>
 
         <div className="flex items-center space-x-2">
-          {tip.isPremium ? (
+          {tipsIsPurchased ? (
+            <div className=" top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
+              <Crown className="w-3 h-3" />
+              <span>Comprado</span>
+            </div>
+          ) : tip.isPremium ? (
             <div className="flex items-center bg-gradient-to-r from-[#FFD700]/20 to-[#FFD700]/10 text-[#FFD700] px-3 py-1.5 rounded-full text-xs font-bold border border-[#FFD700]/40 shadow-sm">
               <Star className="w-3 h-3 mr-1" />
               Premium
@@ -126,7 +189,7 @@ export default function TipCardPublic({
           )}
 
           {/* Indicador de ação */}
-          {tip.isPremium && (
+          {!tipsIsPurchased && tip.isPremium && (
             <div
               className={`flex items-center text-xs font-medium transition-all duration-200 ${
                 isHovered ? "text-[#FFD700]" : "text-gray-400"
@@ -148,7 +211,7 @@ export default function TipCardPublic({
       <div className="mb-3">
         <div className="text-xs text-gray-400 mb-1">Palpite</div>
         <div className="font-medium text-white text-sm">
-          {tip.isPremium ? (
+          {!tipsIsPurchased && tip.isPremium ? (
             <div className="flex items-center">
               <Lock className="w-3 h-3 mr-2 text-[#FFD700]" />
               <span className="text-[#FFD700] font-medium">
@@ -163,7 +226,7 @@ export default function TipCardPublic({
 
       {/* Odds compactas */}
       <div className="flex flex-wrap gap-2">
-        {tip.isPremium ? (
+        {!tipsIsPurchased && tip.isPremium ? (
           <div className="flex items-center px-3 py-1.5 rounded text-xs bg-gradient-to-r from-[#FFD700]/20 to-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/40 shadow-sm">
             <Lock className="w-3 h-3 mr-1" />
             <span className="font-semibold">Odds Premium</span>
@@ -173,7 +236,9 @@ export default function TipCardPublic({
             <div
               key={index}
               className={`flex items-center justify-between px-2 py-1 rounded text-xs ${
-                odd.isBest
+                tipsIsPurchased
+                  ? "flex items-center px-3 py-1.5 rounded text-xs bg-gradient-to-r from-[#FFD700]/20 to-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/40 shadow-sm"
+                  : odd.isBest
                   ? "bg-brand-500/20 text-brand-500 border border-brand-500/30"
                   : "bg-gray-600/50 text-gray-300 border border-gray-500/30"
               }`}
@@ -197,12 +262,35 @@ export default function TipCardPublic({
         <div className="mt-3 pt-3 border-t border-[#FFD700]/40">
           <div className="flex items-center justify-between">
             <div className="text-xs text-[#FFD700] font-medium">
-              🔒 Acesso exclusivo para assinantes
+              {tipsIsPurchased
+                ? ""
+                : canUsePackage
+                ? "🎁 Use seu pacote para desbloquear"
+                : "🔒 Acesso exclusivo para assinantes"}
             </div>
-            <div className="text-xs font-bold text-[#FFD700]">Ver planos →</div>
+            {tipsIsPurchased ? (
+              <div className="text-xs font-bold text-[#FFD700] flex items-center justify-center">
+                <p>Conteúdo premium</p>
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </div>
+            ) : (
+              <div className="text-xs font-bold text-[#FFD700]">
+                {canUsePackage ? "Desbloquear →" : "Ver planos →"}
+              </div>
+            )}
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmação */}
+      <ConfirmTipPurchaseModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmPurchase}
+        tip={tip}
+        tipsRemaining={availablePackage?.tipsRemaining || 0}
+        loading={loading}
+      />
     </div>
   );
 }

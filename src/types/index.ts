@@ -52,6 +52,18 @@ export interface User {
   freeTipsUsed?: number;
   freeTipsLimit?: number;
   createdAt?: Date;
+  packages?: Package[];
+  purchasedTips?: string[];
+}
+
+export interface Package {
+  id: string;
+  name: string;
+  tipsIncluded: number;
+  tipsRemaining: number;
+  purchasedAt: Date;
+  transactionId?: string;
+  lastUsedAt?: Date;
 }
 
 export interface Subscription {
@@ -97,4 +109,14 @@ export interface TipFormData {
   confidence?: number;
   isPremium: boolean;
   odds: Odds[];
+}
+
+export interface TipPurchase {
+  id?: string;
+  userId: string;
+  tipId: string;
+  purchasedAt: Date;
+  packageId: string;
+  packageName: string;
+  transactionId?: string;
 }

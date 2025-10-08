@@ -2,100 +2,57 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { Target, Crown, Clock, TrendingUp, Calendar } from "lucide-react";
+import { Target, Crown, Clock, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import TipCardPublic from "@/src/components/TipCardPublic";
 import { LoadingGetDataUser } from "@/src/components/LoadingGetDataUser";
 import { useRouter } from "next/navigation";
-// Mock data para tips comprados
-const purchasedTips = [
-  {
-    id: "1",
-    category: "football" as const,
-    league: "Premier League",
-    teams: "Liverpool vs Chelsea",
-    matchTime: "2024-01-15T16:30",
-    prediction: "Mais de 2.5 Gols",
-    isPremium: true,
-    purchasedAt: "2024-01-15T10:00",
-    price: 29.9,
-    result: "win" as const,
-    status: "completed" as const,
-    odds: [
-      { house: "Bet365", value: 1.83 },
-      { house: "Betano", value: 1.87 },
-      { house: "Melhor", value: 1.92, isBest: true },
-    ],
-  },
-  {
-    id: "2",
-    category: "football" as const,
-    league: "La Liga",
-    teams: "Barcelona vs Real Madrid",
-    matchTime: "2024-01-14T21:00",
-    prediction: "Ambas Marcam",
-    isPremium: true,
-    purchasedAt: "2024-01-14T09:30",
-    price: 29.9,
-    result: "loss" as const,
-    status: "completed" as const,
-    odds: [
-      { house: "Bet365", value: 1.7 },
-      { house: "Betano", value: 1.73 },
-      { house: "Melhor", value: 1.78, isBest: true },
-    ],
-  },
-  {
-    id: "3",
-    category: "basketball" as const,
-    league: "NBA",
-    teams: "Lakers vs Warriors",
-    matchTime: "2024-01-16T02:30",
-    prediction: "Mais de 220.5 Pontos",
-    isPremium: true,
-    purchasedAt: "2024-01-15T20:00",
-    price: 29.9,
-    result: "pending" as const,
-    status: "active" as const,
-    odds: [
-      { house: "Bet365", value: 1.91 },
-      { house: "Betano", value: 1.95, isBest: true },
-      { house: "Outros", value: 1.88 },
-    ],
-  },
-  {
-    id: "4",
-    category: "tennis" as const,
-    league: "ATP Masters",
-    teams: "Djokovic vs Nadal",
-    matchTime: "2024-01-17T14:00",
-    prediction: "Djokovic Vence",
-    isPremium: true,
-    purchasedAt: "2024-01-16T08:15",
-    price: 29.9,
-    result: "pending" as const,
-    status: "active" as const,
-    odds: [
-      { house: "Bet365", value: 2.1 },
-      { house: "Betano", value: 2.05 },
-      { house: "Melhor", value: 2.15, isBest: true },
-    ],
-  },
-];
+import { Tip } from "@/src/types";
 
 export default function TipsPage() {
   const { user, loading: authLoading } = useAuth();
-  const [tips, setTips] = useState(purchasedTips);
+  const [tips, setTips] = useState<Tip[]>([]);
   const [filter, setFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  // Simular loading de 2 segundos
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/?modal=login");
+      return;
+    }
+
+    if (user?.email) {
+      fetchPurchasedTips();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
+
+  const fetchPurchasedTips = async () => {
+    if (!user?.email) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch(
+        `/api/tips/purchased?email=${encodeURIComponent(user.email)}`
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erro ao carregar tips");
+      }
+
+      setTips(result.tips || []);
+    } catch (err: any) {
+      console.error("Erro ao buscar tips comprados:", err);
+      setError(err.message || "Erro ao carregar tips comprados");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Calcular estatísticas
   const stats = {
@@ -107,12 +64,12 @@ export default function TipsPage() {
       (tips.filter((tip) => tip.result === "win").length /
         Math.max(tips.filter((tip) => tip.result !== "pending").length, 1)) *
       100,
-    totalSpent: tips.reduce((sum, tip) => sum + tip.price, 0),
+    totalSpent: tips.reduce((sum, tip) => sum + (tip.price || 0), 0),
     profit:
       tips
         .filter((tip) => tip.result === "win")
-        .reduce((sum, tip) => sum + tip.price * 1.5, 0) -
-      tips.reduce((sum, tip) => sum + tip.price, 0),
+        .reduce((sum, tip) => sum + (tip.price || 0) * 1.5, 0) -
+      tips.reduce((sum, tip) => sum + (tip.price || 0), 0),
   };
 
   // Filtrar tips
@@ -161,6 +118,27 @@ export default function TipsPage() {
             className="w-full bg-[#a3bd04] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#8fa003] transition-colors"
           >
             Fazer Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar erro se houver
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Erro ao Carregar
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+          <button
+            onClick={fetchPurchasedTips}
+            className="bg-[#a3bd04] hover:bg-[#8fa003] text-white px-6 py-3 rounded-lg transition-colors"
+          >
+            Tentar Novamente
           </button>
         </div>
       </div>
@@ -228,41 +206,7 @@ export default function TipsPage() {
           </div>
         ) : (
           filteredTips.map((tip) => (
-            <div key={tip.id} className="relative">
-              <TipCardPublic tip={tip} onClick={handleTipClick} />
-              {/* Badge de comprado */}
-              <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
-                <Crown className="w-3 h-3" />
-                <span>Comprado</span>
-              </div>
-              {/* Informações de compra */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-b-xl">
-                <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>
-                      Comprado em:{" "}
-                      {new Date(tip.purchasedAt).toLocaleDateString("pt-BR")}
-                    </span>
-                  </div>
-                  <div className="font-medium text-[#a3bd04]">
-                    R$ {tip.price.toFixed(2)}
-                  </div>
-                </div>
-
-                {tip.result === "loss" && (
-                  <div className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium">
-                    ❌ Perda: R$ {tip.price.toFixed(2)}
-                  </div>
-                )}
-                {tip.result === "pending" && (
-                  <div className="mt-2 text-sm text-yellow-600 dark:text-yellow-400 font-medium flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>Aguardando resultado</span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <TipCardPublic key={tip.id} tip={tip} onClick={handleTipClick} />
           ))
         )}
       </div>

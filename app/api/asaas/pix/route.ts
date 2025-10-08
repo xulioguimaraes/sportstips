@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         access_token: ASAAS_API_KEY!,
       },
       body: JSON.stringify({
-        value: planValue,
+        value: 0.01,
         description: planDescription,
         format: "ALL",
         expirationDate: formattedExpirationDate,
