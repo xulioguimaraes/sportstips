@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 const purchasedTips = [
   {
     id: "1",
-    category: "premium" as const,
+    category: "football" as const,
     league: "Premier League",
     teams: "Liverpool vs Chelsea",
     matchTime: "2024-01-15T16:30",
@@ -28,7 +28,7 @@ const purchasedTips = [
   },
   {
     id: "2",
-    category: "premium" as const,
+    category: "football" as const,
     league: "La Liga",
     teams: "Barcelona vs Real Madrid",
     matchTime: "2024-01-14T21:00",
@@ -46,7 +46,7 @@ const purchasedTips = [
   },
   {
     id: "3",
-    category: "premium" as const,
+    category: "basketball" as const,
     league: "NBA",
     teams: "Lakers vs Warriors",
     matchTime: "2024-01-16T02:30",
@@ -64,7 +64,7 @@ const purchasedTips = [
   },
   {
     id: "4",
-    category: "premium" as const,
+    category: "tennis" as const,
     league: "ATP Masters",
     teams: "Djokovic vs Nadal",
     matchTime: "2024-01-17T14:00",

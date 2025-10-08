@@ -13,6 +13,8 @@ export interface Tip {
   createdBy?: string;
   status?: 'active' | 'inactive' | 'completed';
   result?: 'win' | 'loss' | 'pending';
+  purchasedAt?: string;
+  price?: number;
 }
 
 export interface Odds {
@@ -87,7 +89,7 @@ export interface Purchase {
 }
 
 export interface TipFormData {
-  category: 'premium' | 'football' | 'basketball' | 'tennis';
+  category: 'football' | 'basketball' | 'tennis';
   league: string;
   teams: string;
   matchTime: string;
