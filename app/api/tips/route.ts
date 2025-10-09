@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       prediction: body.prediction,
       confidence: body.confidence || 0,
       isPremium: body.isPremium || false,
+      description: body.description || "",
       odds: body.odds || [],
       status: "active",
       createdAt: new Date(),

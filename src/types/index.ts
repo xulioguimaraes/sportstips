@@ -5,6 +5,7 @@ export interface Tip {
   teams: string;
   matchTime: string;
   prediction: string;
+  description?: string;
   confidence?: number;
   isPremium: boolean;
   odds: Odds[];
@@ -106,6 +107,7 @@ export interface TipFormData {
   teams: string;
   matchTime: string;
   prediction: string;
+  description?: string;
   confidence?: number;
   isPremium: boolean;
   odds: Odds[];
