@@ -9,12 +9,13 @@ import TipCardPublic from "@/src/components/TipCardPublic";
 import DatePicker from "@/src/components/DatePicker";
 import PurchaseModalV2 from "@/src/components/PurchaseModalV2";
 import { Target } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [tips, setTips] = useState<Tip[]>([]);
   const [filteredTips, setFilteredTips] = useState<Tip[]>([]);
   const [filterTabs, setFilterTabs] = useState<FilterTab[]>([]);
-
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -82,9 +83,7 @@ export default function Home() {
 
   // Card interactions
   const handleTipClick = (tip: Tip) => {
-    alert(
-      `📋 Análise detalhada: ${tip.teams}\n\n✅ Estatísticas completas\n📈 Histórico de confrontos\n🎯 Justificativa do palpite`
-    );
+    router.push(`/tip/${tip.id}`);
   };
 
   // Premium tips
