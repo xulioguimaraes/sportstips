@@ -8,6 +8,8 @@ import { tipsService } from "@/src/services/tipsService";
 import TipCardPublic from "@/src/components/TipCardPublic";
 import DatePicker from "@/src/components/DatePicker";
 import PurchaseModalV2 from "@/src/components/PurchaseModalV2";
+import PromoCarousel from "@/src/components/PromoCarousel";
+import SocialProfilesCarousel from "@/src/components/SocialProfilesCarousel";
 import { Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -87,7 +89,7 @@ export default function Home() {
   };
 
   // Premium tips
-  const handlePremiumClick = (tip: Tip) => {
+  const handlePremiumClick = (tip: Tip | null) => {
     setSelectedTip(tip);
     setShowPurchaseModal(true);
   };
@@ -131,9 +133,11 @@ export default function Home() {
 
   return (
     <>
+      <PromoCarousel autoPlayInterval={5000} />
+
       <FilterTabs tabs={filterTabs} onFilterChange={handleFilterChange} />
 
-      <div className="px-2 pb-24">
+      <div className="px-2 pb-4">
         <div className="flex justify-between items-center m-1 mb-1">
           <div className="text-lg font-bold whitespace-nowrap pr-6">
             Palpites de
@@ -186,7 +190,10 @@ export default function Home() {
         )}
       </div>
 
-      <FloatingActionButton onClick={() => handlePremiumClick({} as Tip)} />
+      {/* Perfis Oficiais */}
+      <SocialProfilesCarousel />
+
+      <FloatingActionButton onClick={() => handlePremiumClick(null)} />
 
       {/* Modal de Compra */}
       <PurchaseModalV2

@@ -60,6 +60,7 @@ export default function PurchaseModalV2({
       closeModal();
     }
   };
+  console.log(tip)
 
   return (
     <div

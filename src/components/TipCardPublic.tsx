@@ -18,7 +18,6 @@ export default function TipCardPublic({
   onClick,
   onPremiumClick,
 }: TipCardPublicProps) {
-  console.log({ tip });
   const [isHovered, setIsHovered] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loading, setLoading] = useState(false);
